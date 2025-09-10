@@ -151,20 +151,6 @@
       <uri>
         https://fuel.gazebosim.org/1.0/OpenRobotics/models/Oak%20tree
       </uri>
-      <name>oak2</name>
-      <pose>2.99444 -4.95498 -0.3 0 -0 0.8</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Oak%20tree
-      </uri>
-      <name>oak3</name>
-      <pose>-9.12426 -11.2689 -0.3 0 -0 0.3</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Oak%20tree
-      </uri>
       <name>oak4</name>
       <pose>4.21788 -1.41417 -0.3 0 -0 0.1</pose>
     </include>
@@ -182,50 +168,8 @@
       <name>oak6</name>
       <pose>-4.33701 1.32854 -0.3 0 -0 0</pose>
     </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Oak%20tree
-      </uri>
-      <name>oak7</name>
-      <pose>-0.620372 10 -0.3 0 -0 0.5</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Oak%20tree
-      </uri>
-      <name>oak8</name>
-      <pose>3.54698 5 -0.3 0 -0 0.1</pose>
-    </include>
-    
+   
     <!-- Pine trees -->
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Pine%20tree
-      </uri>
-      <name>pine1</name>
-      <pose>6.05721 9.78933 0 0 -0 0.1</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Pine%20tree
-      </uri>
-      <name>pine2</name>
-      <pose>-10.0184 8.85188 0 0 -0 0.3</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Pine%20tree
-      </uri>
-      <name>pine3</name>
-      <pose>-4.62343 -12.5618 0 0 -0 0.2</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Pine%20tree
-      </uri>
-      <name>pine4</name>
-      <pose>7.08738 1.33612 0 0 -0 0</pose>
-    </include>
     <include>
       <uri>
         https://fuel.gazebosim.org/1.0/OpenRobotics/models/Pine%20tree
@@ -241,30 +185,7 @@
       <pose>-2.27195 -8.68441 0 0 -0 0.9</pose>
     </include>
 
-    <!-- Platypus -->
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/platypus
-      </uri>
-      <name>platypus1</name>
-      <pose>-10 5 0 0 0 0</pose>
-    </include>
-
     <!-- Rocks -->
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Falling%20Rock%201
-      </uri>
-      <name>rock1</name>
-      <pose>-6.30926 -8.38159 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Falling%20Rock%202
-      </uri>
-      <name>rock2</name>
-      <pose>-8.27162 -6.19647 0 0 0 0</pose>
-    </include>
     <include>
       <uri>
         https://fuel.gazebosim.org/1.0/OpenRobotics/models/Falling%20Rock%203
@@ -274,25 +195,166 @@
     </include>
     <include>
       <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Falling%20Rock%204
-      </uri>
-      <name>rock4</name>
-      <pose>-10 -12 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Falling%20Rock%205
-      </uri>
-      <name>rock5</name>
-      <pose>-12 -12 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>
         https://fuel.gazebosim.org/1.0/OpenRobotics/models/Falling%20Rock%206
       </uri>
       <name>rock6</name>
       <pose>-14 -12 0 0 0 0</pose>
     </include>
+
+     <actor name="foxy1">
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <!-- STL is only a mesh, no animation, so this acts as a visual -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <scale>0.5 0.5 0.5</scale>
+      </skin>
+      <animation name="static">
+        <!-- Just a static STL (no walk cycle) -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <trajectory id="0" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>-5 1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10</time>
+            <pose>1 1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>20</time>
+            <pose>4 -4 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>30</time>
+            <pose>8 8 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>40</time>
+            <pose>-5 1 0 0 0 0</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+
+     <actor name="foxy2">
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <!-- STL is only a mesh, no animation, so this acts as a visual -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <scale>0.5 0.5 0.5</scale>
+      </skin>
+      <animation name="static2">
+        <!-- Just a static STL (no walk cycle) -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <trajectory id="1" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>3 3 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10</time>
+            <pose>3 -5 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>20</time>
+            <pose>3 -5 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>30</time>
+            <pose>-12 12 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>40</time>
+            <pose>3 3 0 0 0 0</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+
+     <actor name="foxy3">
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <!-- STL is only a mesh, no animation, so this acts as a visual -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <scale>0.5 0.5 0.5</scale>
+      </skin>
+      <animation name="static3">
+        <!-- Just a static STL (no walk cycle) -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <trajectory id="2" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>-10 -10 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>20</time>
+            <pose>10 -10 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>40</time>
+            <pose>10 10 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>60</time>
+            <pose>-10 10 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>80</time>
+            <pose>-10 10 0 0 0 0</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <actor name="foxy4">
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <!-- STL is only a mesh, no animation, so this acts as a visual -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <scale>0.5 0.5 0.5</scale>
+      </skin>
+      <animation name="static4">
+        <!-- Just a static STL (no walk cycle) -->
+        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <trajectory id="3" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>-2 -2 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10</time>
+            <pose>2 -2 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>20</time>
+            <pose>4 -5 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>30</time>
+            <pose>1 -4 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>40</time>
+            <pose>-2 -2 0 0 0 0</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
 
   </world>
 </sdf>
