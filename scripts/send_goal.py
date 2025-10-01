@@ -8,6 +8,8 @@ import numpy as np
 class NavigationState(Enum):
     MOVE_Y_FORWARD = auto()
     MOVE_X_FORWARD = auto()
+    MOVE_Y_BACKWARD = auto()
+    MOVE_X_BACKWARD = auto()
     STOP = auto()
 
 
@@ -15,7 +17,8 @@ class RobotNavigator:
     def __init__(self):
         self.state = NavigationState.MOVE_Y_FORWARD
         self.x0, self.y0 = 0.0, 0.0
-        self.step = 0.5
+        self.step = 2.0
+        self.step_back = -2.0
         self.max_steps = 100
         self.yaw = 0.0
         self.navigator = None
@@ -56,6 +59,28 @@ class RobotNavigator:
 
                 print(f"Moving X forward, Step {self.current_step+1}")
 
+            elif self.state == NavigationState.MOVE_X_BACKWARD:
+                goal_pose.pose.position.x = self.x0 + (self.current_step + 1) * self.step_back
+                goal_pose.pose.position.y = self.y0
+                goal_pose.pose.position.z = 0.0
+                goal_pose.pose.orientation.x = q[0]
+                goal_pose.pose.orientation.y = q[1]
+                goal_pose.pose.orientation.z = q[2]
+                goal_pose.pose.orientation.w = q[3]
+
+                print(f"Moving X forward, Step {self.current_step+1}")
+
+            elif self.state == NavigationState.MOVE_Y_BACKWARD:
+                goal_pose.pose.position.x = self.x0 + (self.current_step + 1) * self.step_back
+                goal_pose.pose.position.y = self.y0
+                goal_pose.pose.position.z = 0.0
+                goal_pose.pose.orientation.x = q[0]
+                goal_pose.pose.orientation.y = q[1]
+                goal_pose.pose.orientation.z = q[2]
+                goal_pose.pose.orientation.w = q[3]
+
+                print(f"Moving X forward, Step {self.current_step+1}")
+
             self.navigator.goToPose(goal_pose)
             while not self.navigator.isTaskComplete():
                 rclpy.spin_once(self.navigator)
@@ -72,8 +97,15 @@ class RobotNavigator:
                         self.state = NavigationState.STOP
                     self.current_step = 0
             else:
-                print("Navigation failed or boundary reached; stopping.")
-                self.state = NavigationState.STOP
+                print("Boundary or obstacle detected or unreachable goal! Changing directions.")
+                self.current_step += 1
+                if self.current_step >= self.max_steps:
+                    if self.state == NavigationState.MOVE_Y_FORWARD:
+                        self.state = NavigationState.MOVE_X_FORWARD
+                    elif self.state == NavigationState.MOVE_X_FORWARD:
+                        self.state = NavigationState.STOP
+                    self.current_step = 0
+                
 
         rclpy.shutdown()
 
