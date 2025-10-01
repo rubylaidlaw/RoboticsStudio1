@@ -21,8 +21,8 @@ class RobotNavigator:
     def __init__(self):
         self.state = NavigationState.MOVE_Y_FORWARD
         self.x0, self.y0 = 0.0, 0.0
-        self.step = 2.0
-        self.step_back = -2.0
+        self.step = 3.0
+        self.step_back = -3.0
         self.max_steps = 100
         self.yaw = 0.0
         self.navigator = None
