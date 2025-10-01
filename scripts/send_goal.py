@@ -1,4 +1,5 @@
 from enum import Enum, auto
+import math
 import rclpy
 from geometry_msgs.msg import PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
@@ -10,6 +11,9 @@ class NavigationState(Enum):
     MOVE_X_FORWARD = auto()
     MOVE_Y_BACKWARD = auto()
     MOVE_X_BACKWARD = auto()
+    TURN_90_LEFT = auto()
+    TURN_90_RIGHT = auto()
+    BACKUP = auto()
     STOP = auto()
 
 
@@ -23,6 +27,10 @@ class RobotNavigator:
         self.yaw = 0.0
         self.navigator = None
         self.current_step = 0
+        self.turn_angle = math.pi / 2
+        self.just_turned = False
+        self.just_backed_up = False
+        self.current_yaw = 0.0
 
     def get_quaternion_from_yaw(self, yaw):
         return [0.0, 0.0, np.sin(yaw / 2), np.cos(yaw / 2)]
@@ -35,60 +43,72 @@ class RobotNavigator:
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = 'map'
             goal_pose.header.stamp = self.navigator.get_clock().now().to_msg()
-            q = self.get_quaternion_from_yaw(self.yaw)
+
+            q = self.get_quaternion_from_yaw(self.current_yaw)
 
             if self.state == NavigationState.MOVE_Y_FORWARD:
                 goal_pose.pose.position.x = self.x0
                 goal_pose.pose.position.y = self.y0 + (self.current_step + 1) * self.step
                 goal_pose.pose.position.z = 0.0
-                goal_pose.pose.orientation.x = q[0]
-                goal_pose.pose.orientation.y = q[1]
-                goal_pose.pose.orientation.z = q[2]
-                goal_pose.pose.orientation.w = q[3]
-
-                print(f"Moving Y forward, Step {self.current_step+1}")
+                goal_pose.pose.orientation.x, goal_pose.pose.orientation.y, goal_pose.pose.orientation.z, goal_pose.pose.orientation.w = q
+                print(f"Moving Y forward, Step {self.current_step + 1}")
 
             elif self.state == NavigationState.MOVE_X_FORWARD:
                 goal_pose.pose.position.x = self.x0 + (self.current_step + 1) * self.step
                 goal_pose.pose.position.y = self.y0
                 goal_pose.pose.position.z = 0.0
-                goal_pose.pose.orientation.x = q[0]
-                goal_pose.pose.orientation.y = q[1]
-                goal_pose.pose.orientation.z = q[2]
-                goal_pose.pose.orientation.w = q[3]
-
-                print(f"Moving X forward, Step {self.current_step+1}")
+                goal_pose.pose.orientation.x, goal_pose.pose.orientation.y, goal_pose.pose.orientation.z, goal_pose.pose.orientation.w = q
+                print(f"Moving X forward, Step {self.current_step + 1}")
 
             elif self.state == NavigationState.MOVE_X_BACKWARD:
                 goal_pose.pose.position.x = self.x0 + (self.current_step + 1) * self.step_back
                 goal_pose.pose.position.y = self.y0
                 goal_pose.pose.position.z = 0.0
-                goal_pose.pose.orientation.x = q[0]
-                goal_pose.pose.orientation.y = q[1]
-                goal_pose.pose.orientation.z = q[2]
-                goal_pose.pose.orientation.w = q[3]
-
-                print(f"Moving X forward, Step {self.current_step+1}")
+                goal_pose.pose.orientation.x, goal_pose.pose.orientation.y, goal_pose.pose.orientation.z, goal_pose.pose.orientation.w = q
+                print(f"Moving X backward, Step {self.current_step + 1}")
 
             elif self.state == NavigationState.MOVE_Y_BACKWARD:
-                goal_pose.pose.position.x = self.x0 + (self.current_step + 1) * self.step_back
+                goal_pose.pose.position.x = self.x0
+                goal_pose.pose.position.y = self.y0 + (self.current_step + 1) * self.step_back
+                goal_pose.pose.position.z = 0.0
+                goal_pose.pose.orientation.x, goal_pose.pose.orientation.y, goal_pose.pose.orientation.z, goal_pose.pose.orientation.w = q
+                print(f"Moving Y backward, Step {self.current_step + 1}")
+
+            elif self.state == NavigationState.TURN_90_LEFT:
+                self.current_yaw += self.turn_angle
+                q = self.get_quaternion_from_yaw(self.current_yaw)
+                goal_pose.pose.position.x = self.x0
                 goal_pose.pose.position.y = self.y0
                 goal_pose.pose.position.z = 0.0
-                goal_pose.pose.orientation.x = q[0]
-                goal_pose.pose.orientation.y = q[1]
-                goal_pose.pose.orientation.z = q[2]
-                goal_pose.pose.orientation.w = q[3]
+                goal_pose.pose.orientation.x, goal_pose.pose.orientation.y, goal_pose.pose.orientation.z, goal_pose.pose.orientation.w = q
+                print("Turning 90 degrees left")
 
-                print(f"Moving X forward, Step {self.current_step+1}")
+            elif self.state == NavigationState.TURN_90_RIGHT:
+                self.current_yaw -= self.turn_angle
+                q = self.get_quaternion_from_yaw(self.current_yaw)
+                goal_pose.pose.position.x = self.x0
+                goal_pose.pose.position.y = self.y0
+                goal_pose.pose.position.z = 0.0
+                goal_pose.pose.orientation.x, goal_pose.pose.orientation.y, goal_pose.pose.orientation.z, goal_pose.pose.orientation.w = q
+                print("Turning 90 degrees right")
+
+            elif self.state == NavigationState.BACKUP:
+                goal_pose.pose.position.x = self.x0
+                goal_pose.pose.position.y = self.y0 + self.step_back
+                goal_pose.pose.position.z = 0.0
+                goal_pose.pose.orientation.x, goal_pose.pose.orientation.y, goal_pose.pose.orientation.z, goal_pose.pose.orientation.w = q
+                print("Backing up")
 
             self.navigator.goToPose(goal_pose)
             while not self.navigator.isTaskComplete():
                 rclpy.spin_once(self.navigator)
 
             result = self.navigator.getResult()
-            print(f"Step {self.current_step+1}, Result: {result}")
+            print(f"Step {self.current_step + 1}, Result: {result}")
 
             if result == "SUCCEEDED":
+                self.just_turned = False
+                self.just_backed_up = False
                 self.current_step += 1
                 if self.current_step >= self.max_steps:
                     if self.state == NavigationState.MOVE_Y_FORWARD:
@@ -97,15 +117,14 @@ class RobotNavigator:
                         self.state = NavigationState.STOP
                     self.current_step = 0
             else:
-                print("Boundary or obstacle detected or unreachable goal! Changing directions.")
-                self.current_step += 1
-                if self.current_step >= self.max_steps:
-                    if self.state == NavigationState.MOVE_Y_FORWARD:
-                        self.state = NavigationState.MOVE_X_FORWARD
-                    elif self.state == NavigationState.MOVE_X_FORWARD:
-                        self.state = NavigationState.STOP
-                    self.current_step = 0
-                
+                if not self.just_turned:
+                    self.state = NavigationState.TURN_90_LEFT
+                    self.just_turned = True
+                elif not self.just_backed_up:
+                    self.state = NavigationState.BACKUP
+                    self.just_backed_up = True
+                else:
+                    self.state = NavigationState.STOP
 
         rclpy.shutdown()
 
@@ -117,48 +136,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# from geometry_msgs.msg import PoseStamped
-# from nav2_simple_commander.robot_navigator import BasicNavigator
-# import rclpy
-# import numpy as np
-
-# def get_quaternion_from_yaw(yaw):
-#     return [0.0, 0.0, np.sin(yaw/2), np.cos(yaw/2)]
-
-# rclpy.init()
-# navigator = BasicNavigator()
-
-# x0, y0 = 0.0, 0.0
-# step = 0.5
-# max_steps = 100  # 0.1m x 100 = 10m
-# yaw = 0.0
-# boundary_found = False
-
-# for i in range(max_steps):
-#     goal_pose = PoseStamped()
-#     goal_pose.header.frame_id = 'map'
-#     goal_pose.header.stamp = navigator.get_clock().now().to_msg()
-#     goal_pose.pose.position.x = x0
-#     goal_pose.pose.position.y = y0 + (i + 1) * step
-#     goal_pose.pose.position.z = 0.0
-#     q = get_quaternion_from_yaw(yaw)
-#     goal_pose.pose.orientation.x = q[0]
-#     goal_pose.pose.orientation.y = q[1]
-#     goal_pose.pose.orientation.z = q[2]
-#     goal_pose.pose.orientation.w = q[3]
-
-#     navigator.goToPose(goal_pose)
-#     while not navigator.isTaskComplete():
-#         rclpy.spin_once(navigator)
-#     result = navigator.getResult()
-#     print(f"Step {i+1}, Goal: y={goal_pose.pose.position.y:.2f}, Result: {result}")
-#     # Test for nav failure (could happen at boundary)
-#     # if not hasattr(result, 'status') or str(result.status) != "SUCCEEDED":
-#     #     print("Boundary or obstacle detected or unreachable goal! Stopping.")
-#     #     boundary_found = True
-#     #     break
-
-
-# rclpy.shutdown()
