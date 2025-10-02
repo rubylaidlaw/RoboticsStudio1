@@ -5,7 +5,6 @@ from geometry_msgs.msg import PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
 import numpy as np
 
-
 class NavigationState(Enum):
     MOVE_Y_FORWARD = auto()
     MOVE_X_FORWARD = auto()
@@ -15,7 +14,6 @@ class NavigationState(Enum):
     TURN_90_RIGHT = auto()
     BACKUP = auto()
     STOP = auto()
-
 
 class RobotNavigator:
     def __init__(self):
@@ -92,6 +90,14 @@ class RobotNavigator:
         rclpy.init()
         self.navigator = BasicNavigator()
 
+        self.move_y_forward = move_y_forward
+        self.move_x_forward = move_x_forward
+        self.move_y_backward = move_y_backward
+        self.move_x_backward = move_x_backward
+        self.turn_90_left = turn_90_left
+        self.turn_90_right = turn_90_right
+        self.backup = backup
+
         while self.state != NavigationState.STOP:
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = 'map'
@@ -106,10 +112,17 @@ class RobotNavigator:
             result = self.navigator.getResult()
             print(f"Step {self.current_step + 1}, Result: {result}")
 
-            if result == "SUCCEEDED":
-                pass
-
-
+            # if result == "SUCCEEDED":
+            #     self.just_turned = False
+            #     self.just_backed_up = False
+            #     self.current_step += 1
+            #     if boundry <= 0.5:
+            #         turn_90_left = True
+            #         turn_90_right = False
+            #     else:
+            #         move_y_forward = True
+            #         move_x_forward = False
+           
             if result == "SUCCEEDED":
                 self.just_turned = False
                 self.just_backed_up = False
