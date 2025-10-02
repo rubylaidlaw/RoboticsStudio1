@@ -7,35 +7,63 @@ from nav2_simple_commander.robot_navigator import BasicNavigator
 import numpy as np
 
 # --- Waypoint Manager ---
+# class WaypointManager:
+#     def __init__(self, start=(0.0, 0.0), step=3.0):
+#         self.current_pos = start
+#         self.step = step
+#         self.phase = 'y'  # current movement direction phase ('y' or 'x')
+#         self.phase_count = 0
+
+#     def get_next_waypoint(self):
+#         x, y = self.current_pos
+#         if self.phase == 'y':
+#             y += self.step
+#             self.phase_count += 1
+#             if self.phase_count >= 3:  # after 3 steps along y, switch to x
+#                 self.phase = 'x'
+#                 self.phase_count = 0
+#         else:  # self.phase == 'x'
+#             x += self.step
+#             self.phase_count += 1
+#             if self.phase_count >= 2:  # after 2 steps along x, switch back to y
+#                 self.phase = 'y'
+#                 self.phase_count = 0
+
+#         self.current_pos = (x, y)
+#         return self.current_pos
+
+#     def reset(self):
+#         self.current_pos = (0.0, 0.0)
+#         self.phase = 'y'
+#         self.phase_count = 0
+
 class WaypointManager:
-    def __init__(self, start=(0.0, 0.0), step=3.0):
-        self.current_pos = start
-        self.step = step
-        self.phase = 'y'  # current movement direction phase ('y' or 'x')
-        self.phase_count = 0
+    def __init__(self):
+        # Predefined grid search waypoints as a list of tuples
+        self.grid_search_waypoints = [
+            (10, 10),
+            (-10, 9),
+            (10, 8),
+            (-10, 7),
+            (10, 6),
+            (-10, 5),
+            (10, 4),
+            (-10, 3),
+            (10, 2),
+            (-10, 1),
+            (10, 0),
+        ]
+        self.index = 0
 
     def get_next_waypoint(self):
-        x, y = self.current_pos
-        if self.phase == 'y':
-            y += self.step
-            self.phase_count += 1
-            if self.phase_count >= 3:  # after 3 steps along y, switch to x
-                self.phase = 'x'
-                self.phase_count = 0
-        else:  # self.phase == 'x'
-            x += self.step
-            self.phase_count += 1
-            if self.phase_count >= 2:  # after 2 steps along x, switch back to y
-                self.phase = 'y'
-                self.phase_count = 0
-
-        self.current_pos = (x, y)
-        return self.current_pos
+        if self.index >= len(self.grid_search_waypoints):
+            return None  # No more waypoints
+        wp = self.grid_search_waypoints[self.index]
+        self.index += 1
+        return wp
 
     def reset(self):
-        self.current_pos = (0.0, 0.0)
-        self.phase = 'y'
-        self.phase_count = 0
+        self.index = 0
 
 
 # --- Robot Navigator ---
@@ -79,8 +107,8 @@ class RobotNavigator:
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = 'map'
             goal_pose.header.stamp = self.navigator.get_clock().now().to_msg()
-            goal_pose.pose.position.x = waypoint[0]
-            goal_pose.pose.position.y = waypoint[1]
+            goal_pose.pose.position.x = float(waypoint[0])
+            goal_pose.pose.position.y = float(waypoint[1])
             goal_pose.pose.position.z = 0.0
 
             q = self.get_quaternion_from_yaw(self.current_yaw)
