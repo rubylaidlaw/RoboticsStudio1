@@ -39,7 +39,7 @@ import numpy as np
 
 class WaypointManager:
     def __init__(self):
-        # Predefined grid search waypoints as a list of tuples
+        # Predefined grid search waypoints
         self.grid_search_waypoints = [
             (10, 10),
             (-10, 9),
