@@ -56,6 +56,22 @@ class RobotNavigator:
         step_limit = 20  # max steps to avoid infinite loop for demo
         steps_taken = 0
 
+        init_pose = PoseStamped()
+        init_pose.header.frame_id = 'map'
+        init_pose.header.stamp = self.navigator.get_clock().now().to_msg()
+        init_pose.pose.position.x = 0.0
+        init_pose.pose.position.y = 0.0
+        init_pose.pose.position.z = 0.0
+        q = self.get_quaternion_from_yaw(0.0)  # face forward or whichever yaw
+        init_pose.pose.orientation.x, init_pose.pose.orientation.y, init_pose.pose.orientation.z, init_pose.pose.orientation.w = q
+
+        print("Navigating to home position (0,0)")
+        self.navigator.goToPose(init_pose)
+        while not self.navigator.isTaskComplete():
+            rclpy.spin_once(self.navigator)
+        result = self.navigator.getResult()
+        print(f"Arrived at home: (0,0), result: {result}")
+
         while steps_taken < step_limit:
             waypoint = self.waypoint_manager.get_next_waypoint()
             steps_taken += 1
