@@ -34,7 +34,7 @@ Now install this package:
   mkdir -p 41068_ws/src
   ```
 * Copy this package to the `src` directory in this workspace
-* Build package. If you get an error suggesting a missing dependency, make sure you have followed all of the above installation instructions correctly.
+* Build package. If cd ryou get an error suggesting a missing dependency, make sure you have followed all of the above installation instructions correctly.
   ```bash
   source /opt/ros/humble/setup.bash
   cd 41068_ws
