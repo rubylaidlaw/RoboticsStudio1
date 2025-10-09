@@ -29,7 +29,6 @@
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </joint>
 
-
     <!-- Projectile -->
     <link name="harpoon_projectile">
       <inertial>
@@ -38,15 +37,15 @@
         <inertia ixx="0.0001" iyy="0.0001" izz="0.0001"/>
       </inertial>
       <visual>
-        <origin xyz="0 0 0.62" rpy="0 0 1.5708"/>
+        <origin xyz="0 0 0.75" rpy="0 0 1.5708"/>
         <geometry>
-          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/projectile.STL"/>
+          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/projectile.STL" scale="0.1 0.1 0.1"/>
         </geometry>
       </visual>
       <collision>
-        <origin xyz="0 0 0.62" rpy="0 0 1.5708"/>
+        <origin xyz="0 0 0.75" rpy="0 0 1.5708"/>
         <geometry>
-          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/projectile.STL"/>
+          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/projectile.STL" scale="0.1 0.1 0.1"/>
         </geometry>
       </collision>
     </link>
