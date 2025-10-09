@@ -239,7 +239,6 @@
       </script>
     </actor>
 
-
      <actor name="foxy2">
       <pose>0 0 0 0 0 0</pose>
       <skin>
@@ -276,8 +275,12 @@
           </waypoint>
         </trajectory>
       </script>
+      <plugin
+        filename="ignition-gazebo-thermal-system"
+        name="ignition::gazebo::systems::Thermal">
+        <temperature>350</temperature> <!-- Kelvin (about 77 °C) -->
+      </plugin>
     </actor>
-
 
      <actor name="foxy3">
       <pose>0 0 0 0 0 0</pose>
