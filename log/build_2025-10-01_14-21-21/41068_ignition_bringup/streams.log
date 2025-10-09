@@ -1,0 +1,23 @@
+[0.017s] Invoking command in '/home/liamhdavis/RoboticsStudio1/build/41068_ignition_bringup': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/liamhdavis/RoboticsStudio1 -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/liamhdavis/RoboticsStudio1/install/41068_ignition_bringup
+[0.066s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.220s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[2.640s] [31mCMake Error at CMakeLists.txt:11 (find_package):
+[2.640s]   By not providing "Findros_ign_interfaces.cmake" in CMAKE_MODULE_PATH this
+[2.641s]   project has asked CMake to find a package configuration file provided by
+[2.641s]   "ros_ign_interfaces", but CMake did not find one.
+[2.641s] 
+[2.641s]   Could not find a package configuration file provided by
+[2.641s]   "ros_ign_interfaces" with any of the following names:
+[2.641s] 
+[2.641s]     ros_ign_interfacesConfig.cmake
+[2.641s]     ros_ign_interfaces-config.cmake
+[2.641s] 
+[2.642s]   Add the installation prefix of "ros_ign_interfaces" to CMAKE_PREFIX_PATH or
+[2.642s]   set "ros_ign_interfaces_DIR" to a directory containing one of the above
+[2.642s]   files.  If "ros_ign_interfaces" provides a separate development package or
+[2.642s]   SDK, be sure it has been installed.
+[2.642s] 
+[2.642s] [0m
+[2.642s] -- Configuring incomplete, errors occurred!
+[2.642s] See also "/home/liamhdavis/RoboticsStudio1/build/41068_ignition_bringup/CMakeFiles/CMakeOutput.log".
+[2.648s] Invoked command in '/home/liamhdavis/RoboticsStudio1/build/41068_ignition_bringup' returned '1': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/liamhdavis/RoboticsStudio1 -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/liamhdavis/RoboticsStudio1/install/41068_ignition_bringup
