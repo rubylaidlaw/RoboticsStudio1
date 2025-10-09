@@ -205,12 +205,12 @@
       <pose>0 0 0 0 0 0</pose>
       <skin>
         <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
         <scale>0.5 0.5 0.5</scale>
       </skin>
       <animation name="static">
         <!-- Just a static STL (no walk cycle) -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
       </animation>
       <script>
         <loop>true</loop>
@@ -243,12 +243,13 @@
       <pose>0 0 0 0 0 0</pose>
       <skin>
         <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <!-- <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename> -->
         <scale>0.5 0.5 0.5</scale>
       </skin>
       <animation name="static2">
         <!-- Just a static STL (no walk cycle) -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
       </animation>
       <script>
         <loop>true</loop>
@@ -286,12 +287,14 @@
       <pose>0 0 0 0 0 0</pose>
       <skin>
         <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <!-- <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename> -->
         <scale>0.5 0.5 0.5</scale>
       </skin>
       <animation name="static3">
         <!-- Just a static STL (no walk cycle) -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <!-- <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename> -->
       </animation>
       <script>
         <loop>true</loop>
@@ -324,12 +327,12 @@
       <pose>0 0 0 0 0 0</pose>
       <skin>
         <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
         <scale>0.5 0.5 0.5</scale>
       </skin>
       <animation name="static4">
         <!-- Just a static STL (no walk cycle) -->
-        <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
       </animation>
       <script>
         <loop>true</loop>
