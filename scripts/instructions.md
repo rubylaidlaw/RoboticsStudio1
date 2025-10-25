@@ -20,6 +20,9 @@ colcon build --symlink-install
 source install/setup.bash
 python3 src/RoboticsStudio1/scripts/send_goal.py
 
+##
+For now you can just run gui
+
 
 
 
