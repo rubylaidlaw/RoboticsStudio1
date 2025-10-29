@@ -174,7 +174,7 @@ class RobotLauncher(tk.Tk):
                 "source ~/41068_ws/install/setup.bash && "
                 "export LIBGL_ALWAYS_SOFTWARE=1 && "
                 "ros2 launch 41068_ignition_bringup 41068_ignition.launch.py "
-                "slam:=true nav2:=true rviz:=true world:=large_demo; "
+                "slam:=true nav2:=true rviz:=true rviz_config:=/path/to/your/static_config.rviz world:=large_demo; "
                 "exec bash"
             )
             if terminal == 'gnome-terminal':
@@ -218,6 +218,16 @@ class RobotLauncher(tk.Tk):
             self.nav_button.config(state="disabled")
             self.status_label.config(text="Status: Not Running", foreground="red")
             print("Simulation stopped")
+            
+            # Add this block to run reset.sh after stopping
+            reset_script_path = os.path.expanduser("~/41068_ws/src/RoboticsStudio1/scripts/reset.sh")
+            try:
+                # Run the script as a separate process
+                subprocess.Popen(['bash', reset_script_path])
+                print("Reset script executed.")
+            except Exception as e:
+                print(f"Failed to execute reset script: {e}")
+
 
     def start_navigation(self):
         if self.nav_process is not None and self.nav_process.poll() is None:
@@ -232,7 +242,6 @@ class RobotLauncher(tk.Tk):
             print("Navigation started")
         except Exception as e:
             print(f"Failed to start navigation: {e}")
-
 
     def toggle_estop(self):
         self.estop_active = not self.estop_active
