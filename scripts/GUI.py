@@ -34,7 +34,7 @@ class RobotLauncher(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Foxtrack Rover Control")
-        self.geometry("500x675")
+        self.geometry("500x800")
         self.estop_active = False
         self.simulation_process = None
         self.nav_process = None
@@ -65,16 +65,24 @@ class RobotLauncher(tk.Tk):
         title_label = ttk.Label(self, text="Foxtrack Rover Control Panel", font=("Arial", 16, "bold"))
         title_label.pack(pady=20)
 
-        launch_frame = ttk.LabelFrame(self, text="Simulation Control", padding=10)
+        launch_frame = ttk.LabelFrame(self, text="Launch Control", padding=10)
         launch_frame.pack(pady=10, padx=20, fill="x")
+
+        ttk.Label(launch_frame, text="X Coordinate (-10 to 10):").pack(anchor='w')
+        self.spawn_x_entry = ttk.Entry(launch_frame)
+        self.spawn_x_entry.pack(fill='x', pady=5)
+
+        ttk.Label(launch_frame, text="Y Coordinate (-10 to 10):").pack(anchor='w')
+        self.spawn_y_entry = ttk.Entry(launch_frame)
+        self.spawn_y_entry.pack(fill='x', pady=5)
 
         self.launch_button = ttk.Button(
             launch_frame,
             text="Launch Simulation",
-            command=self.launch_simulation,
+            command=self.launch_simulation_with_optional_coords,
             width=30
         )
-        self.launch_button.pack(pady=5)
+        self.launch_button.pack(pady=10)
 
         self.stop_button = ttk.Button(
             launch_frame,
@@ -126,8 +134,8 @@ class RobotLauncher(tk.Tk):
         terminal_frame.pack(pady=10, padx=20, fill="x")
 
         self.open_terminal_button = ttk.Button(
-            terminal_frame, 
-            text="Open New Terminal", 
+            terminal_frame,
+            text="Open New Terminal",
             command=self.open_new_terminal,
             width=30
         )
@@ -137,10 +145,11 @@ class RobotLauncher(tk.Tk):
         dist_frame.pack(pady=10, padx=20, fill="x")
 
         self.distance_label = ttk.Label(dist_frame,
-            text="N/A", 
-            font=("Arial", 12)
-        )
+                                    text="N/A",
+                                    font=("Arial", 12)
+                                    )
         self.distance_label.pack(pady=10)
+
 
     def get_terminal_emulator(self):
         terminals = ['xterm', 'gnome-terminal', 'konsole', 'xfce4-terminal', 'terminator']
@@ -149,11 +158,24 @@ class RobotLauncher(tk.Tk):
                 return term
         return None
 
-    def launch_simulation(self):
+    def launch_simulation_with_optional_coords(self):
         if self.simulation_process is not None:
             print("Simulation already running!")
             return
 
+        # Default values
+        x, y = 0.0, 0.0
+
+        # Attempt to read coordinates if provided
+        x_str = self.spawn_x_entry.get().strip()
+        y_str = self.spawn_y_entry.get().strip()
+        if x_str != "" and y_str != "":
+            x = float(x_str)
+            y = float(y_str)
+            if not (-10 <= x <= 10) or not (-10 <= y <= 10):
+                print("Coordinates must be within -10 to 10 range.")
+                return
+       
         terminal = self.get_terminal_emulator()
         if terminal is None:
             self.status_label.config(
@@ -168,14 +190,21 @@ class RobotLauncher(tk.Tk):
         launch_file = os.path.join(self.project_root, "launch", "41068_ignition.launch.py")
         rviz_config = os.path.join(self.project_root, "config", "41068.rviz")
 
+        # Build launch command with or without spawn arguments
+        spawn_args = ""
+        if x is not None and y is not None:
+            spawn_args = f"spawn_x:={x} spawn_y:={y}"
+
         launch_cmd = (
             f"source {setup_bash} && "
             f"source {ws_setup_bash} && "
             "export LIBGL_ALWAYS_SOFTWARE=1 && "
             f"ros2 launch {launch_file} "
+            f"{spawn_args} "
             "slam:=true nav2:=true rviz:=true "
             f"rviz_config:={rviz_config} world:=large_demo; exec bash"
         )
+
         if terminal == 'gnome-terminal':
             cmd = [terminal, '--', 'bash', '-c', launch_cmd]
         elif terminal == 'konsole':
@@ -188,20 +217,27 @@ class RobotLauncher(tk.Tk):
         self.simulation_process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
+            preexec_fn=os.setsid  # to enable killing process group
         )
 
         self.launch_button.config(state="disabled")
         self.stop_button.config(state="normal")
         self.nav_button.config(state="normal")
         self.status_label.config(text="Status: Running", foreground="green")
-        print(f"Simulation launched successfully using {terminal}!")
+
+        if x is not None and y is not None:
+            print(f"Simulation launched successfully at ({x}, {y}) using {terminal}!")
+        else:
+            print(f"Simulation launched successfully using {terminal}!")
+
 
     def stop_simulation(self):
         if self.simulation_process is not None:
             try:
                 os.killpg(os.getpgid(self.simulation_process.pid), signal.SIGTERM)
-            except:
+            except Exception as e:
+                print(f"Error stopping simulation process group: {e}")
                 try:
                     self.simulation_process.terminate()
                     self.simulation_process.wait(timeout=5)
@@ -215,8 +251,9 @@ class RobotLauncher(tk.Tk):
             print("Simulation stopped")
 
             reset_script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reset.sh")
-            subprocess.Popen(['bash', reset_script_path])
-            print("Reset script executed.")
+            if os.path.exists(reset_script_path):
+                subprocess.Popen(['bash', reset_script_path])
+                print("Reset script executed.")
 
     def start_navigation(self):
         if self.nav_process is not None and self.nav_process.poll() is None:

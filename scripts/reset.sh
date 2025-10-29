@@ -1,5 +1,8 @@
 #!/bin/bash
 
+source /opt/ros/humble/setup.bash
+source ~/41068_ws/install/setup.bash
+
 sleep 2
 
 pkill -f gazebo
