@@ -36,18 +36,19 @@ class WaypointManager:
     def __init__(self):
         self.x_min, self.x_max = -10, 10
         self.y_min, self.y_max = -10, 10
+        self.generated_waypoints = []
 
     def get_next_waypoint(self):
         x = random.uniform(self.x_min, self.x_max)
         y = random.uniform(self.y_min, self.y_max)
-        return (x, y)
+        waypoint = (x, y)
+        self.generated_waypoints.append(waypoint)
+        return waypoint
 
-    def get_previous_waypoint(self):
-        # Optionally, you could store the last generated waypoint if needed
-        return None
-
-    def reset(self):
-        pass  # Not necessary for random generation
+    def print_generated_waypoints(self):
+        print("Generated Waypoints:")
+        for i, wp in enumerate(self.generated_waypoints):
+            print(f"Waypoint {i+1}: ({wp[0]:.2f}, {wp[1]:.2f})")
 
 
 class NavAndDepthFollower(Node):
