@@ -68,7 +68,3 @@
   gz_type_name: "ignition.msgs.PointCloudPacked"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/world/large_demo/create"
-  gz_topic_name: "/world/large_demo/create"
-  type: "ros_gz_interfaces/srv/SpawnEntity"
-  direction: "BIDIRECTIONAL"
