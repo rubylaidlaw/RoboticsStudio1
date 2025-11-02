@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <model name="simple_box">
+    <pose>0 0 0.5 0 0 0</pose>
+    <link name="link">
+      <pose>0 0 0 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.5</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.5</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0 1 0 1</ambient>
+          <diffuse>0 1 0 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Make it dynamic -->
+    <static>false</static>
+
+    <!-- Add a velocity plugin for ROS2 control -->
+    <plugin name="box_drive" filename="ignition::gazebo::systems::VelocityControl">
+      <topic>/cmd_vel</topic> <!-- This is the topic your ROS2 node will publish to -->
+      <link_name>link</link_name>
+      <max_force>10</max_force>  <!-- Adjust as needed -->
+      <velocity_decay>0.1</velocity_decay>
+    </plugin>
+  </model>
+</sdf>

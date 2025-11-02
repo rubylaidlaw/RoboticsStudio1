@@ -4,7 +4,7 @@ import time
 import math
 import rclpy
 from rclpy.node import Node
-from ros_gz_interfaces.srv import SetEntityPose
+from geometry_msgs.msg import Pose
 import threading
 
 class BoxManager(Node):
@@ -14,25 +14,14 @@ class BoxManager(Node):
         self.box_name = box_name
         self.sdf_path = sdf_path or "/home/student/ros2_ws/src/RoboticsStudio1/models/box.sdf"
         
-        # Create service client
-        self.set_pose_client = self.create_client(
-            SetEntityPose,
-            f'/world/{self.world}/set_pose'
+        # Create publisher for setting pose (very fast!)
+        self.pose_pub = self.create_publisher(
+            Pose,
+            f'/model/{self.box_name}/pose',
+            10
         )
         
         self.get_logger().info('BoxManager initialized')
-    
-    def wait_for_service(self, timeout=10.0):
-        """Wait for the set_pose service to be ready"""
-        self.get_logger().info('Waiting for set_pose service...')
-        start_time = time.time()
-        while not self.set_pose_client.wait_for_service(timeout_sec=1.0):
-            if time.time() - start_time > timeout:
-                self.get_logger().error('Service timeout!')
-                return False
-            self.get_logger().info('Still waiting...')
-        self.get_logger().info('Service is ready!')
-        return True
     
     def spawn_box(self, x=0, y=0, z=0.5):
         """Spawn the box using the Ignition create service"""
@@ -54,43 +43,48 @@ class BoxManager(Node):
         print("[BoxManager] Box spawned.")
     
     def set_pose(self, x=0, y=0, z=0.5, yaw=0):
-        """Move the box using ROS 2 service (fast!)"""
+        """Move the box to a new position using ROS 2 topic (very fast!)"""
         qz = math.sin(yaw / 2)
         qw = math.cos(yaw / 2)
         
-        request = SetEntityPose.Request()
-        request.entity.name = self.box_name
-        request.entity.type = 2  # MODEL type
+        pose_msg = Pose()
+        pose_msg.position.x = x
+        pose_msg.position.y = y
+        pose_msg.position.z = z
+        pose_msg.orientation.x = 0.0
+        pose_msg.orientation.y = 0.0
+        pose_msg.orientation.z = qz
+        pose_msg.orientation.w = qw
         
-        request.pose.position.x = x
-        request.pose.position.y = y
-        request.pose.position.z = z
-        request.pose.orientation.x = 0.0
-        request.pose.orientation.y = 0.0
-        request.pose.orientation.z = qz
-        request.pose.orientation.w = qw
-        
-        # Call service asynchronously (non-blocking, very fast!)
-        self.set_pose_client.call_async(request)
+        self.pose_pub.publish(pose_msg)
     
     def move_smoothly(self, target_x, target_y, target_z=0.5, target_yaw=0,
                       current_x=0, current_y=0, current_z=0.5, current_yaw=0,
-                      speed=1.0, update_rate=50):
+                      speed=1.0, update_rate=30):
         """
-        Move the box smoothly with high update rate - NOW IT WILL WORK!
+        Move the box smoothly - looks like continuous walking motion.
+        
+        Args:
+            target_x, target_y, target_z: Target position
+            target_yaw: Target orientation (radians)
+            current_x, current_y, current_z: Current position
+            current_yaw: Current orientation (radians)
+            speed: Movement speed in meters/second
+            update_rate: How many updates per second (higher = smoother)
         """
         distance = math.sqrt((target_x - current_x)**2 + (target_y - current_y)**2)
         duration = distance / speed
-        steps = max(10, int(duration * update_rate))
+        steps = max(5, int(duration * update_rate))
         sleep_time = duration / steps
         
-        self.get_logger().info(f'Moving to ({target_x}, {target_y}) at {speed} m/s with {steps} steps @ {update_rate} Hz')
+        self.get_logger().info(f'Moving to ({target_x}, {target_y}) at {speed} m/s with {steps} steps')
         
         for i in range(steps + 1):
             t = i / steps
             x = current_x + (target_x - current_x) * t
             y = current_y + (target_y - current_y) * t
             z = current_z + (target_z - current_z) * t
+            
             # Interpolate yaw
             yaw_diff = target_yaw - current_yaw
             while yaw_diff > math.pi:
@@ -104,7 +98,7 @@ class BoxManager(Node):
             if i < steps:
                 time.sleep(sleep_time)
         
-        self.get_logger().info('Movement complete!')
+        self.get_logger().info('Movement complete')
         return target_x, target_y, target_z, target_yaw
     
     def remove_box(self):
@@ -121,59 +115,60 @@ class BoxManager(Node):
         subprocess.run(cmd)
         print("[BoxManager] Box removed.")
 
+
 def main(args=None):
     rclpy.init(args=args)
     
     manager = BoxManager()
     
-    # Spin in background thread
+    # Spin in background thread so ROS 2 can handle publishing
     spin_thread = threading.Thread(target=rclpy.spin, args=(manager,), daemon=True)
     spin_thread.start()
     
-    # Give bridge time to start
-    time.sleep(3)
-    
-    # Spawn the box
+    # Spawn the box (using ign command)
     manager.spawn_box(x=0, y=0, z=0.5)
     time.sleep(2)
-
-    # Wait for service to be ready
-    if not manager.wait_for_service(timeout=15.0):
-        print("ERROR: Service not available")
-        manager.destroy_node()
-        rclpy.shutdown()
-        return
     
     # Track current position
-    current_pos = [0, 0, 0.5, 0]
+    current_pos = [0, 0, 0.5, 0]  # x, y, z, yaw
+    
+    # Move smoothly - much faster and smoother now!
     current_pos = manager.move_smoothly(
-        target_x=1.0, target_y=1.0, target_z=0, target_yaw=math.pi/4,
+        target_x=1.0, target_y=1.0, target_z=0.5, target_yaw=math.pi/4,
         current_x=current_pos[0], current_y=current_pos[1],
         current_z=current_pos[2], current_yaw=current_pos[3],
         speed=1.0,
-        update_rate=50  # 50 updates per second = very smooth!
+        update_rate=30  # 30 Hz for very smooth motion
     )
+    
     time.sleep(0.5)
     
+    # Move to second position
     current_pos = manager.move_smoothly(
-        target_x=2.0, target_y=1.0, target_z=0, target_yaw=math.pi/4,
+        target_x=2.0, target_y=1.0, target_z=0.5, target_yaw=math.pi/4,
         current_x=current_pos[0], current_y=current_pos[1],
         current_z=current_pos[2], current_yaw=current_pos[3],
         speed=1.0,
-        update_rate=50
+        update_rate=30
     )
+    
     time.sleep(0.5)
     
+    # Move to third position
     current_pos = manager.move_smoothly(
-        target_x=3.0, target_y=1.0, target_z=0, target_yaw=math.pi/4,
+        target_x=3.0, target_y=1.0, target_z=0.5, target_yaw=math.pi/4,
         current_x=current_pos[0], current_y=current_pos[1],
         current_z=current_pos[2], current_yaw=current_pos[3],
         speed=1.0,
-        update_rate=50
+        update_rate=30
     )
+    
     time.sleep(2)
+    
+    # Remove the box (using ign command)
     manager.remove_box()
     
+    # Cleanup
     manager.destroy_node()
     rclpy.shutdown()
 

@@ -13,16 +13,7 @@ def generate_launch_description():
     ros_gz_share = FindPackageShare('ros_gz_sim')
     
     # 1️⃣ Launch Ignition Gazebo
-    service_bridge = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        arguments=[
-            '/world/empty/set_pose@ros_gz_interfaces/srv/SetEntityPose'
-        ],
-        output='screen',
-        name='set_pose_bridge'
-    )
-
+ 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([FindPackageShare('ros_gz_sim'), 'launch', 'gz_sim.launch.py'])
@@ -49,17 +40,17 @@ def generate_launch_description():
 
     # 3️⃣ Bridge /cmd_vel and /odom
     bridge = Node(
-        package='ros_gz_bridge',
+        package='ros_ign_bridge',
         executable='parameter_bridge',
         arguments=[
             '/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist',
             '/odom@nav_msgs/msg/Odometry@ignition.msgs.Odometry',
-            '/world/empty/set_pose@ros_gz_interfaces/srv/SetEntityPose@ignition.msgs.Pose@ignition.msgs.Boolean'
+            '/world/empty/create@ros_gz_interfaces/srv/SpawnEntity@ignition.msgs.EntityFactory@ignition.msgs.Boolean',
+            '/world/empty/remove@ros_gz_interfaces/srv/DeleteEntity@ignition.msgs.Entity@ignition.msgs.Boolean'
     
         ],
         output='screen'
     )
-
 
     spawn_box = Node(
         package='41068_ignition_bringup',
@@ -73,7 +64,6 @@ def generate_launch_description():
             default_value='empty.sdf',
             description='Ignition world file'
         ),
-        service_bridge,
         gazebo,
         # spawn_entity,
         bridge,
