@@ -201,17 +201,12 @@
       <pose>-14 -12 0 0 0 0</pose>
     </include>
 
-     <actor name="wombat1">
+     <actor name="kangaroo1">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-       
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-       
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static">
-      
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="0" type="walking">
@@ -240,17 +235,12 @@
     </actor>
 
 
-     <actor name="wombat2">
+     <actor name="kangaroo2">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-    
-       
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static2">
-    
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="1" type="walking">
@@ -279,17 +269,12 @@
     </actor>
 
 
-     <actor name="wombat3">
+     <actor name="kangaroo3">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-       
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-     
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static3">
-      
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="2" type="walking">
@@ -317,17 +302,12 @@
       </script>
     </actor>
 
-    <actor name="wombat4">
+    <actor name="kangaroo4">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-      
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-      
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static4">
-        
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/Wombat.obj</filename>
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="3" type="walking">
