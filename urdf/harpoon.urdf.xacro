@@ -22,6 +22,14 @@
       </visual>
     </link>
 
+    <!-- <gazebo reference="harpoon_barrel">
+      <plugin name="fire_projectile_plugin"
+              filename="libfire_projectile_system.so">
+        <barrel_link>harpoon_barrel</barrel_link>
+        <projectile_velocity>30.0</projectile_velocity>
+      </plugin>
+    </gazebo> -->
+
     <!-- Fixed joint connecting base to barrel -->
     <joint name="harpoon_joint" type="fixed">
       <parent link="harpoon_base"/>
@@ -29,7 +37,7 @@
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </joint>
 
-    <!-- Projectile -->
+    <!-- Projectile
     <link name="harpoon_projectile">
       <inertial>
         <mass value="0.05"/>
@@ -50,12 +58,12 @@
       </collision>
     </link>
 
-    <!-- Initially attach projectile to barrel -->
+    Initially attach projectile to barrel
     <joint name="harpoon_projectile_joint" type="fixed">
       <parent link="harpoon_barrel"/>
       <child link="harpoon_projectile"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-    </joint>
+    </joint> -->
 
     <joint name="harpoon_mount" type="fixed">
       <parent link="${parent_link}"/>

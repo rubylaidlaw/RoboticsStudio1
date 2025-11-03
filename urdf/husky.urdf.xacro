@@ -44,13 +44,13 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <!-- <visual name="base_link_fixed_joint_lump__arch_visual_7">
+    <visual name="base_link_fixed_joint_lump__arch_visual_7">
       <origin xyz="0.0012 0 0.251" rpy="0 0 0"/>
       <geometry>
         <mesh filename="file://$(find 41068_ignition_bringup)/urdf/meshes/jpl04_arch_nosensor.stl"/>
       </geometry>
       <material name="black"/>
-    </visual> -->
+    </visual>
 
     <collision name="base_link_collision">
       <origin xyz="0 0 0.12" rpy="0 0 0"/>
