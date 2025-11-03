@@ -1,1 +1,0 @@
-/home/student/ros2_ws/src/RoboticsStudio1/launch/spawn_robot_with_bridge.launch.py
