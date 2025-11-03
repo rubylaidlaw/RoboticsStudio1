@@ -201,161 +201,135 @@
       <pose>-14 -12 0 0 0 0</pose>
     </include>
 
-     <actor name="foxy1">
+     <actor name="kangaroo1">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-        <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-        <scale>0.5 0.5 0.5</scale>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static">
-        <!-- Just a static STL (no walk cycle) -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="0" type="walking">
           <waypoint>
             <time>0</time>
-            <pose>-5 1 0 0 0 0</pose>
+            <pose>7 9 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>10</time>
-            <pose>1 1 0 0 0 0</pose>
-          </waypoint>
-          <waypoint>
-            <time>20</time>
-            <pose>4 -4 0 0 0 0</pose>
+            <pose>7 9 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>30</time>
-            <pose>8 8 0 0 0 0</pose>
+            <pose>5 8 0 0 0 0</pose>
           </waypoint>
           <waypoint>
-            <time>40</time>
-            <pose>-5 1 0 0 0 0</pose>
+            <time>50</time>
+            <pose>2 8 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>60</time>
+            <pose>3 7 0 0 0 0</pose>
           </waypoint>
         </trajectory>
       </script>
     </actor>
 
-     <actor name="foxy2">
+
+     <actor name="kangaroo2">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-        <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-        <!-- <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename> -->
-        <scale>0.5 0.5 0.5</scale>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static2">
-        <!-- Just a static STL (no walk cycle) -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="1" type="walking">
           <waypoint>
             <time>0</time>
-            <pose>3 3 0 0 0 0</pose>
-          </waypoint>
-          <waypoint>
-            <time>10</time>
-            <pose>3 -5 0 0 0 0</pose>
+            <pose>2 2 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>20</time>
-            <pose>3 -5 0 0 0 0</pose>
+            <pose>6 -5 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>30</time>
-            <pose>-12 12 0 0 0 0</pose>
+            <pose>3 -5 0 0 0 0</pose>
           </waypoint>
           <waypoint>
-            <time>40</time>
-            <pose>3 3 0 0 0 0</pose>
+            <time>60</time>
+            <pose>10 12 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>70</time>
+            <pose>12 12 0 0 0 0</pose>
           </waypoint>
         </trajectory>
       </script>
-      <plugin
-        filename="ignition-gazebo-thermal-system"
-        name="ignition::gazebo::systems::Thermal">
-        <temperature>350</temperature> <!-- Kelvin (about 77 °C) -->
-      </plugin>
     </actor>
 
-     <actor name="foxy3">
+
+     <actor name="kangaroo3">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-        <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-        <!-- <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename> -->
-        <scale>0.5 0.5 0.5</scale>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static3">
-        <!-- Just a static STL (no walk cycle) -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-        <!-- <filename>file:///home/student/ros2_ws/install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename> -->
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="2" type="walking">
           <waypoint>
             <time>0</time>
-            <pose>-10 -10 0 0 0 0</pose>
-          </waypoint>
-          <waypoint>
-            <time>20</time>
-            <pose>10 -10 0 0 0 0</pose>
+            <pose>-12 -10 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>40</time>
-            <pose>10 10 0 0 0 0</pose>
+            <pose>-10 -10 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>60</time>
-            <pose>-10 10 0 0 0 0</pose>
+            <pose>-7 7 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>70</time>
+            <pose>-8 -5 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>80</time>
-            <pose>-10 10 0 0 0 0</pose>
+            <pose>-10 -6 0 0 0 0</pose>
           </waypoint>
         </trajectory>
       </script>
     </actor>
 
-    <actor name="foxy4">
+    <actor name="kangaroo4">
       <pose>0 0 0 0 0 0</pose>
       <skin>
-        <!-- STL is only a mesh, no animation, so this acts as a visual -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-        <scale>0.5 0.5 0.5</scale>
+        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/kangaroo/kang.dae</filename>
+        <scale>1 1 1</scale>
       </skin>
-      <animation name="static4">
-        <!-- Just a static STL (no walk cycle) -->
-        <filename>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/veryperfectfoxcolourdae.dae</filename>
-      </animation>
       <script>
         <loop>true</loop>
         <trajectory id="3" type="walking">
           <waypoint>
             <time>0</time>
-            <pose>-2 -2 0 0 0 0</pose>
+            <pose>-3 -8 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>10</time>
-            <pose>2 -2 0 0 0 0</pose>
+            <pose>4 -8 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>20</time>
-            <pose>4 -5 0 0 0 0</pose>
+            <pose>7 -7 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>30</time>
-            <pose>1 -4 0 0 0 0</pose>
+            <pose>6 -6 0 0 0 0</pose>
           </waypoint>
           <waypoint>
             <time>40</time>
-            <pose>-2 -2 0 0 0 0</pose>
+            <pose>5 -5 0 0 0 0</pose>
           </waypoint>
         </trajectory>
       </script>
