@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <sdf version="1.9">
-  <model name="fox">
+  <model name="wombat1">
     <pose>0 0 0 0 0 0</pose>
     <link name="body">
       <inertial>
@@ -11,26 +11,27 @@
           <izz>0.1</izz>
         </inertia>
       </inertial>
+
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/meshes/veryperfectfoxcolour.stl</uri>
-            <scale>1.0 1.0 1.0</scale>
+            <uri>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/wombat.dae</uri>
+            <scale>0.5 0.5 0.5</scale>
           </mesh>
         </geometry>
       </collision>
-      
+
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/meshes/veryperfectfoxcolour.stl</uri>
-            <scale>1 1 1</scale>
+            <uri>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/wombat/wombat.dae</uri>
+            <scale>0.5 0.5 0.5</scale>
           </mesh>
         </geometry>
         <material>
-          <ambient>1.0 0.0 0.0 1</ambient>
-          <diffuse>1.0 0.0 0.0 1</diffuse>
-          <specular>0.3 0.1 0.1 1</specular>
+          <ambient>0.5 0.7 1.0 1</ambient>
+          <diffuse>0.5 0.7 1.0 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
         </material>
       </visual>
     </link>
