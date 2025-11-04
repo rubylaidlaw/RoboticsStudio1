@@ -5,10 +5,10 @@ from std_msgs.msg import String
 import math
 import json
 from ros_gz_interfaces.srv import SpawnEntity, DeleteEntity, SetEntityPose
-from geometry_msgs.msg import Pose, Point, Quaternion
 import time
 import subprocess
 import threading
+import random
 
 class FoxManagerNode(Node):
     
@@ -24,7 +24,10 @@ class FoxManagerNode(Node):
             f'/world/{self.world}/set_pose'
         )
 
-  
+        ## MIN & MAX VARIABLES FOR WORLD
+        self.xmin, self.xmax = -11, 11
+        self.ymin, self.ymax = -11, 11
+
         self.foxes = {
             'foxy1': {
                 'waypoints': [(-5, 1, 0), (1, 1, 0), (4, -4, 0), (8, 8, 0)],
@@ -90,21 +93,36 @@ class FoxManagerNode(Node):
         subprocess.run(cmd)
         print("[BoxManager] Box spawned.")
     
+    
     def spawnAllFoxes(self):
-        """Spawn all foxes at once using /world/.../create_multiple"""
-        entities = []
+        
+        ## SPAWNING ALL FOXES USING ROS BRIDGE AND CREATE_MULTIPLE SERVICE
+        
+        foxes = []
         for fox_name, data in self.foxes.items():
-            start_pos = data['waypoints'][0]
+            
+            ## GENERATING RANDOM SPAWN POSE
+            xrand = random.uniform(self.xmin, self.xmax)
+            yrand = random.uniform(self.ymin, self.ymax)
+            yawrand = random.uniform(-math.pi, math.pi)
+
+            data['current_pos'] = [xrand, yrand, 0.0, yawrand]
+
+            ## QUATERNION FROM YAW
+            qz = math.sin(yawrand / 2)
+            qw = math.cos(yawrand / 2)
+
+            ## BUILDING THE ENTITY REQUEST 
             entity_str = (
                 f'{{ name: "{fox_name}" '
                 f'sdf_filename: "{self.sdf_path}" '
-                f'pose: {{ position: {{ x: {start_pos[0]}, y: {start_pos[1]}, z: {start_pos[2]} }}, '
-                f'orientation: {{ x: 0, y: 0, z: 0, w: 1 }} }} }}'
+                f'pose: {{ position: {{ x: {xrand}, y: {yrand}, z: {0.0} }}, '
+                f'orientation: {{ x: 0, y: 0, z: {qz}, w: {qw} }} }} }}'
             )
-            entities.append(entity_str)
+            foxes.append(entity_str)
 
-        # ✅ Wrap in `data: [ ... ]` for the repeated field
-        req = f'data: [ {", ".join(entities)} ]'
+        # WRAPPING THE DATA
+        req = f'data: [ {", ".join(foxes)} ]'
 
         cmd = [
             "ign", "service", "-s", f"/world/{self.world}/create_multiple",
@@ -113,7 +131,7 @@ class FoxManagerNode(Node):
             "--timeout", "10000",
             "--req", req
         ]
-
+     
         print(f"[FoxManager] Spawning all {len(self.foxes)} foxes...")
         result = subprocess.run(cmd, capture_output=True, text=True)
 
