@@ -15,15 +15,23 @@ class FoxManagerNode(Node):
     
     def __init__(self):
         super().__init__('foxManagerNode')
+        print("&&&&&&&&$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
+        print("&&&&&&&&$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
+        print("&&&&&&&&$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
+       
         self.world = "large_demo"
         self.box_name = "fox"
         self.sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model.sdf"
         self.shot = False
         # Create service client
-        self.set_pose_client = self.create_client(
-            SetEntityPose,
-            f'/world/{self.world}/set_pose'
-        )
+        self.set_pose_client = self.create_client(SetEntityPose,
+                                                 f'/world/{self.world}/set_pose')
+
+        self.spawn_client = self.create_client(SpawnEntity,
+                                               f'/world/{self.world}/create')
+        
+        self.delete_client = self.create_client(DeleteEntity,
+                                                f'/world/{self.world}/remove')
 
         self.shot_sub = self.create_subscription(Point,
                                                  '/fox_shot',
@@ -71,57 +79,6 @@ class FoxManagerNode(Node):
 
         self.get_logger().info('FoxManager initialized with shot detection')
     
-    
-    def spawnAllFoxes(self):
-        
-        ## SPAWNING ALL FOXES USING ROS BRIDGE AND CREATE_MULTIPLE SERVICE
-        
-        foxes = []
-        for fox_name, data in self.foxes.items():
-            
-            ## GENERATING RANDOM SPAWN POSE
-            xrand = random.uniform(self.xmin, self.xmax)
-            yrand = random.uniform(self.ymin, self.ymax)
-            yawrand = random.uniform(-math.pi, math.pi)
-
-            data['current_pos'] = [xrand, yrand, 0.0, yawrand]
-
-            ## QUATERNION FROM YAW
-            qz = math.sin(yawrand / 2)
-            qw = math.cos(yawrand / 2)
-
-            ## BUILDING THE ENTITY REQUEST 
-            entity_str = (
-                f'{{ name: "{fox_name}" '
-                f'sdf_filename: "{self.sdf_path}" '
-                f'pose: {{ position: {{ x: {xrand}, y: {yrand}, z: {0.0} }}, '
-                f'orientation: {{ x: 0, y: 0, z: {qz}, w: {qw} }} }} }}'
-            )
-            foxes.append(entity_str)
-
-        # WRAPPING THE DATA
-        req = f'data: [ {", ".join(foxes)} ]'
-
-        cmd = [
-            "ign", "service", "-s", f"/world/{self.world}/create_multiple",
-            "--reqtype", "ignition.msgs.EntityFactory_V",
-            "--reptype", "ignition.msgs.Boolean",
-            "--timeout", "10000",
-            "--req", req
-        ]
-     
-        print(f"[FoxManager] Spawning all {len(self.foxes)} foxes...")
-        result = subprocess.run(cmd, capture_output=True, text=True)
-
-        if result.returncode == 0:
-            print("[FoxManager] All foxes spawned successfully!")
-            print("Output:", result.stdout)
-        else:
-            print("[FoxManager] Error spawning foxes:")
-            print(result.stderr)
-
-    
-    
     def move_all_foxes_step(self, dt=0.05):
         """Move all foxes one step toward their next waypoint"""
         for fox_name, fox_data in self.foxes.items():
@@ -152,6 +109,93 @@ class FoxManagerNode(Node):
             # Set pose for that fox (each loop)
             self.set_pose_for_fox(fox_name, nx, ny, cz, nyaw)
 
+    
+    # def spawnAllFoxes(self):
+        
+    #     ## SPAWNING ALL FOXES USING ROS BRIDGE AND CREATE_MULTIPLE SERVICE
+        
+    #     foxes = []
+    #     for fox_name, data in self.foxes.items():
+            
+    #         ## GENERATING RANDOM SPAWN POSE
+    #         xrand = random.uniform(self.xmin, self.xmax)
+    #         yrand = random.uniform(self.ymin, self.ymax)
+    #         yawrand = random.uniform(-math.pi, math.pi)
+
+    #         data['current_pos'] = [xrand, yrand, 0.0, yawrand]
+
+    #         ## QUATERNION FROM YAW
+    #         qz = math.sin(yawrand / 2)
+    #         qw = math.cos(yawrand / 2)
+
+    #         ## BUILDING THE ENTITY REQUEST 
+    #         entity_str = (
+    #             f'{{ name: "{fox_name}" '
+    #             f'sdf_filename: "{self.sdf_path}" '
+    #             f'pose: {{ position: {{ x: {xrand}, y: {yrand}, z: {0.0} }}, '
+    #             f'orientation: {{ x: 0, y: 0, z: {qz}, w: {qw} }} }} }}'
+    #         )
+    #         foxes.append(entity_str)
+
+    #     # WRAPPING THE DATA
+    #     req = f'data: [ {", ".join(foxes)} ]'
+
+    #     cmd = [
+    #         "ign", "service", "-s", f"/world/{self.world}/create_multiple",
+    #         "--reqtype", "ignition.msgs.EntityFactory_V",
+    #         "--reptype", "ignition.msgs.Boolean",
+    #         "--timeout", "10000",
+    #         "--req", req
+    #     ]
+     
+    #     print(f"[FoxManager] Spawning all {len(self.foxes)} foxes...")
+    #     result = subprocess.run(cmd, capture_output=True, text=True)
+
+    #     if result.returncode == 0:
+    #         print("[FoxManager] All foxes spawned successfully!")
+    #         print("Output:", result.stdout)
+    #     else:
+    #         print("[FoxManager] Error spawning foxes:")
+    #         print(result.stderr)
+
+    def spawnAllFoxes(self):
+        """
+        Spawn all foxes one by one using the ROS 2 SpawnEntity service.
+        Movement will not start until all foxes have been spawned.
+        """
+        from ros_gz_interfaces.msg import EntityFactory
+
+        for fox_name, data in self.foxes.items():
+            # Random spawn position and yaw
+            xrand = random.uniform(self.xmin, self.xmax)
+            yrand = random.uniform(self.ymin, self.ymax)
+            yawrand = random.uniform(-math.pi, math.pi)
+
+            data['current_pos'] = [xrand, yrand, 0.0, yawrand]
+
+            # Convert yaw to quaternion
+            qz = math.sin(yawrand / 2)
+            qw = math.cos(yawrand / 2)
+
+            # Build the request
+            req = SpawnEntity.Request()
+            req.entity_factory = EntityFactory()
+            req.entity_factory.name = fox_name
+            req.entity_factory.sdf_filename = self.sdf_path
+            req.entity_factory.pose.position.x = xrand
+            req.entity_factory.pose.position.y = yrand
+            req.entity_factory.pose.position.z = 0.0
+            req.entity_factory.pose.orientation.x = 0.0
+            req.entity_factory.pose.orientation.y = 0.0
+            req.entity_factory.pose.orientation.z = qz
+            req.entity_factory.pose.orientation.w = qw
+
+            # Send async request and wait for completion
+            future = self.spawn_client.call_async(req)
+           
+        self.get_logger().info("[FoxManager] All foxes spawned successfully!")
+
+
     def set_pose_for_fox(self, fox_name, x, y, z, yaw):
         qz = math.sin(yaw / 2)
         qw = math.cos(yaw / 2)
@@ -167,19 +211,28 @@ class FoxManagerNode(Node):
         self.set_pose_client.call_async(req)
 
     def remove_fox(self, fox_name):
-        """Remove a specific fox by name"""
-        req = f'type: MODEL; name: "{fox_name}"'
-        cmd = [
-            "ign", "service", "-s", f"/world/{self.world}/remove",
-            "--reqtype", "ignition.msgs.Entity",
-            "--reptype", "ignition.msgs.Boolean",
-            "--timeout", "5000",
-            "--req", req
-        ]
-        print(f"[FoxManager] Removing fox '{fox_name}'...")
-        subprocess.run(cmd, capture_output=True)
-        print("[FoxManager] Fox removed.")
+        """Remove a fox entity asynchronously, with a callback."""
+        req = DeleteEntity.Request()
+        req.entity.name = fox_name
+        req.entity.type = 2  # MODEL
 
+        self.get_logger().info(f"[FoxManager] Requesting removal of '{fox_name}'...")
+
+        # Send async request
+        future = self.delete_client.call_async(req)
+
+        # Register callback to handle response later
+        def on_delete_done(fut):
+            try:
+                response = fut.result()
+                if response.success:
+                    self.get_logger().info(f"[FoxManager] '{fox_name}' successfully removed.")
+                else:
+                    self.get_logger().warn(f"[FoxManager] Failed to remove '{fox_name}' — entity not found?")
+            except Exception as e:
+                self.get_logger().error(f"[FoxManager] Delete request for '{fox_name}' failed: {e}")
+
+        future.add_done_callback(on_delete_done)
 
     def shootCallback(self, msg):
 
@@ -237,15 +290,18 @@ class FoxManagerNode(Node):
         roll = 0.0
         pitch = math.pi/2
         yaw = cyaw
+        z = 0.01
         current_roll = 0.0
         current_pitch = 0.0
 
         roll_step = (roll - 0.0) / steps
         pitch_step = (pitch - current_pitch) / steps
+        z_step = z / steps
 
         for i in range(1, steps + 1):
             roll = current_roll + roll_step * i
             pitch = current_pitch + pitch_step * i
+            cz = cz + z_step * i
 
             # Convert to quaternion
             qx, qy, qz, qw = self.euler_to_quaternion(roll, pitch, yaw)
@@ -270,9 +326,10 @@ class FoxManagerNode(Node):
             time.sleep(0.05)
         
         dead_name = f"{hitFox}_dead"
-        self.spawn_fox_model(dead_name, cx, cy, cz, roll=0.0, pitch=math.pi/2, yaw=cyaw)
+        self.spawn_fox_model(dead_name, cx, cy, cz, roll, pitch, yaw)
+
         self.remove_fox(hitFox)
-        time.sleep(2)
+        time.sleep(5)
         self.remove_fox(dead_name)
 
         self.get_logger().info(f"{hitFox} has gradually fallen and is now lying down.")
@@ -307,29 +364,36 @@ class FoxManagerNode(Node):
 
         self.set_pose_client.call_async(req)
         
-    def spawn_fox_model(self, fox_name, x, y, z, roll=0.0, pitch=0.0, yaw=0.0):
-        """Spawn a fox using a specific SDF model at a given pose."""
-        qx, qy, qz, qw = self.euler_to_quaternion(roll, pitch, yaw)
-        sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model_dead.sdf"
+    def spawn_fox_model(self, fox_name, x, y, z, roll, pitch, yaw):
+        """
+        Spawn a single fox using ROS 2 SpawnEntity service (through ROS-Ignition bridge),
+        following the same pattern as spawnAllFoxes.
+        """
+        from ros_gz_interfaces.msg import EntityFactory
+        from ros_gz_interfaces.srv import SpawnEntity
+        import math
 
-        req = (
-            f'name: "{fox_name}"; '
-            f'sdf_filename: "{sdf_path}"; '
-            f'pose: {{position: {{x: {x}, y: {y}, z: {z}}}, '
-            f'orientation: {{x: {qx}, y: {qy}, z: {qz}, w: {qw}}}}}'
-        )
+        # Convert yaw to quaternion
+        qz = math.sin(yaw / 2)
+        qw = math.cos(yaw / 2)
 
-        cmd = [
-            "ign", "service", "-s", f"/world/{self.world}/create",
-            "--reqtype", "ignition.msgs.EntityFactory",
-            "--reptype", "ignition.msgs.Boolean",
-            "--timeout", "5000",
-            "--req", req
-        ]
+        # Build the request
+        req = SpawnEntity.Request()
+        req.entity_factory = EntityFactory()
+        req.entity_factory.name = fox_name
+        req.entity_factory.sdf_filename = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model_dead.sdf"
+        req.entity_factory.pose.position.x = x
+        req.entity_factory.pose.position.y = y
+        req.entity_factory.pose.position.z = z
+        req.entity_factory.pose.orientation.x = -math.pi/2
+        req.entity_factory.pose.orientation.y = 0.0
+        req.entity_factory.pose.orientation.z = qz
+        req.entity_factory.pose.orientation.w = qw
 
-        subprocess.run(cmd, capture_output=True)
-        print(f"[FoxManager] Spawned '{fox_name}' from {sdf_path} at ({x:.2f}, {y:.2f}, {z:.2f})")
-
+        # Send async request and wait for completion
+        future = self.spawn_client.call_async(req)
+        # Optionally, wait for the service response
+ 
 
 def main(args=None):
     rclpy.init(args=args)
@@ -364,7 +428,7 @@ def main(args=None):
         manager.shootCallback(shot_msg)
     
     # Uncomment to test
-    threading.Thread(target=test_shot, daemon=True).start()
+    # threading.Thread(target=test_shot, daemon=True).start()
     
     # Movement loop
     try:
