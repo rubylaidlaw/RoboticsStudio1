@@ -11,6 +11,12 @@ def generate_launch_description():
 
     ld = LaunchDescription()
 
+    # Get paths to directories
+    pkg_path = FindPackageShare('41068_ignition_bringup')
+    config_path = PathJoinSubstitution([pkg_path,
+                                       'config'])
+
+    # Additional command line arguments
     # Declare launch arguments for spawn position (dynamic)
     declare_x_arg = DeclareLaunchArgument(
         'spawn_x',
@@ -33,7 +39,7 @@ def generate_launch_description():
     )
     use_sim_time = LaunchConfiguration('use_sim_time')
     ld.add_action(use_sim_time_launch_arg)
-
+    
     rviz_launch_arg = DeclareLaunchArgument(
         'rviz',
         default_value='False',
@@ -77,10 +83,22 @@ def generate_launch_description():
         executable='ekf_node',
         name='robot_localization',
         output='screen',
-        parameters=[PathJoinSubstitution([config_path, 'robot_localization.yaml']),
+        parameters=[PathJoinSubstitution([config_path,
+                                          'robot_localization.yaml']),
                     {'use_sim_time': use_sim_time}]
     )
     ld.add_action(robot_localization_node)
+
+    service_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=[
+            '/world/large_demo/set_pose@ros_gz_interfaces/srv/SetEntityPose'
+        ],
+        output='screen',
+        name='set_pose_bridge'
+    )
+    ld.add_action(service_bridge)
 
     # Start Gazebo to simulate the robot in the chosen world
     world_launch_arg = DeclareLaunchArgument(
@@ -95,8 +113,8 @@ def generate_launch_description():
                              'launch', 'ign_gazebo.launch.py']),
         launch_arguments={
             'ign_args': [PathJoinSubstitution([pkg_path,
-                                              'worlds',
-                                              [LaunchConfiguration('world'), '.sdf']]),
+                                               'worlds',
+                                               [LaunchConfiguration('world'), '.sdf']]),
                          ' -r']}.items()
     )
     ld.add_action(gazebo)
@@ -142,7 +160,15 @@ def generate_launch_description():
     )
     ld.add_action(nav2)
 
+    spawn_fox = Node(
+        package='41068_ignition_bringup',
+        executable='foxManagerNode.py',
+        output='screen'
+    )
+    ld.add_action(spawn_fox)
+
     return ld
+
 
 
 
