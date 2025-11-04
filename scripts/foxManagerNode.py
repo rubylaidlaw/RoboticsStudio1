@@ -15,10 +15,7 @@ class FoxManagerNode(Node):
     
     def __init__(self):
         super().__init__('foxManagerNode')
-        print("&&&&&&&&$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
-        print("&&&&&&&&$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
-        print("&&&&&&&&$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
-       
+     
         self.world = "large_demo"
         self.box_name = "fox"
         self.sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model.sdf"
@@ -109,54 +106,6 @@ class FoxManagerNode(Node):
             # Set pose for that fox (each loop)
             self.set_pose_for_fox(fox_name, nx, ny, cz, nyaw)
 
-    
-    # def spawnAllFoxes(self):
-        
-    #     ## SPAWNING ALL FOXES USING ROS BRIDGE AND CREATE_MULTIPLE SERVICE
-        
-    #     foxes = []
-    #     for fox_name, data in self.foxes.items():
-            
-    #         ## GENERATING RANDOM SPAWN POSE
-    #         xrand = random.uniform(self.xmin, self.xmax)
-    #         yrand = random.uniform(self.ymin, self.ymax)
-    #         yawrand = random.uniform(-math.pi, math.pi)
-
-    #         data['current_pos'] = [xrand, yrand, 0.0, yawrand]
-
-    #         ## QUATERNION FROM YAW
-    #         qz = math.sin(yawrand / 2)
-    #         qw = math.cos(yawrand / 2)
-
-    #         ## BUILDING THE ENTITY REQUEST 
-    #         entity_str = (
-    #             f'{{ name: "{fox_name}" '
-    #             f'sdf_filename: "{self.sdf_path}" '
-    #             f'pose: {{ position: {{ x: {xrand}, y: {yrand}, z: {0.0} }}, '
-    #             f'orientation: {{ x: 0, y: 0, z: {qz}, w: {qw} }} }} }}'
-    #         )
-    #         foxes.append(entity_str)
-
-    #     # WRAPPING THE DATA
-    #     req = f'data: [ {", ".join(foxes)} ]'
-
-    #     cmd = [
-    #         "ign", "service", "-s", f"/world/{self.world}/create_multiple",
-    #         "--reqtype", "ignition.msgs.EntityFactory_V",
-    #         "--reptype", "ignition.msgs.Boolean",
-    #         "--timeout", "10000",
-    #         "--req", req
-    #     ]
-     
-    #     print(f"[FoxManager] Spawning all {len(self.foxes)} foxes...")
-    #     result = subprocess.run(cmd, capture_output=True, text=True)
-
-    #     if result.returncode == 0:
-    #         print("[FoxManager] All foxes spawned successfully!")
-    #         print("Output:", result.stdout)
-    #     else:
-    #         print("[FoxManager] Error spawning foxes:")
-    #         print(result.stderr)
 
     def spawnAllFoxes(self):
         """
@@ -428,7 +377,7 @@ def main(args=None):
         manager.shootCallback(shot_msg)
     
     # Uncomment to test
-    # threading.Thread(target=test_shot, daemon=True).start()
+    threading.Thread(target=test_shot, daemon=True).start()
     
     # Movement loop
     try:
