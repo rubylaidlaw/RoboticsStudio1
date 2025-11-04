@@ -167,6 +167,16 @@ def generate_launch_description():
     )
     ld.add_action(spawn_fox)
 
+    #Start fox detector
+    fox_detector = Node(
+        package='41068_ignition_bringup',
+        executable='fox_detector',
+        name='fox_detector',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+    ld.add_action(fox_detector)
+
     return ld
 
 
