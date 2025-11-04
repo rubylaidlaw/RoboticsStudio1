@@ -6,6 +6,7 @@ import math
 import json
 from ros_gz_interfaces.srv import SpawnEntity, DeleteEntity, SetEntityPose
 import time
+from geometry_msgs.msg import Point
 import subprocess
 import threading
 import random
@@ -24,6 +25,11 @@ class FoxManagerNode(Node):
             f'/world/{self.world}/set_pose'
         )
 
+        self.shot_sub = self.create_subscription(Point,
+                                                 '/fox_shot',
+                                                 self.shootCallback,
+                                                 10)
+
         ## MIN & MAX VARIABLES FOR WORLD
         self.xmin, self.xmax = -11, 11
         self.ymin, self.ymax = -11, 11
@@ -34,64 +40,36 @@ class FoxManagerNode(Node):
                 'current_pos': [-5, 1, 0, 0],  # x, y, z, yaw
                 'current_wp_index': 0,
                 'speed': 0.5,
-                'shot': False
+                'shot': False,
+                'death_animation': None
             },
             'foxy2': {
                 'waypoints': [(3, 3, 0), (3, -5, 0), (3, -5, 0), (-12, 12, 0)],
                 'current_pos': [3, 3, 0, 0],
                 'current_wp_index': 0,
                 'speed': 0.5,
-                'shot': False
+                'shot': False,
+                'death_animation': None
             },
             'foxy3': {
                 'waypoints': [(-10, -10, 0), (10, -10, 0), (10, 10, 0), (-10, 10, 0)],
                 'current_pos': [-10, -10, 0, 0],
                 'current_wp_index': 0,
                 'speed': 0.5,
-                'shot': False
+                'shot': False,
+                'death_animation': None
             },
             'foxy4': {
                 'waypoints': [(-2, -2, 0), (2, -2, 0), (4, -5, 0), (1, -4, 0)],
                 'current_pos': [-2, -2, 0, 0],
                 'current_wp_index': 0,
                 'speed': 0.5,
-                'shot': False
+                'shot': False,
+                'death_animation': None
             }
         }
 
-        self.get_logger().info('BoxManager initialized')
-    
-    def wait_for_service(self, timeout=10.0):
-        """Wait for the set_pose service to be ready"""
-        self.get_logger().info('Waiting for set_pose service...')
-        start_time = time.time()
-        while not self.set_pose_client.wait_for_service(timeout_sec=1.0):
-            if time.time() - start_time > timeout:
-                self.get_logger().error('Service timeout!')
-                return False
-            self.get_logger().info('Still waiting...')
-        self.get_logger().info('Service is ready!')
-        return True
-    
-    def spawnFox(self, x=0, y=0, z=0.5):
-
-        req = (
-            f'name: "{self.box_name}"; '
-            f'sdf_filename: "{self.sdf_path}"; '
-            f'pose: {{position: {{x: {x}, y: {y}, z: {z}}}, '
-            f'orientation: {{x: 0, y: 0, z: 0, w: 1}}}}'
-        )
-
-        cmd = [
-            "ign", "service", "-s", f"/world/{self.world}/create",
-            "--reqtype", "ignition.msgs.EntityFactory",
-            "--reptype", "ignition.msgs.Boolean",
-            "--timeout", "5000",
-            "--req", req
-        ]
-        print(f"[BoxManager] Spawning box '{self.box_name}'...")
-        subprocess.run(cmd)
-        print("[BoxManager] Box spawned.")
+        self.get_logger().info('FoxManager initialized with shot detection')
     
     
     def spawnAllFoxes(self):
@@ -142,90 +120,7 @@ class FoxManagerNode(Node):
             print("[FoxManager] Error spawning foxes:")
             print(result.stderr)
 
-    def set_all_poses(self):
-        """Send all fox poses to Gazebo using /set_pose_vector service."""
-        from ros_gz_interfaces.msg import EntityPose
-        from geometry_msgs.msg import Pose
-
-        if not self.set_pose_vector_client.service_is_ready():
-            self.get_logger().warn("set_pose_vector service not ready!")
-            return
-
-        request = SetEntityPoseVector.Request()
-
-        for name, data in self.foxes.items():
-            entity_pose = EntityPose()
-            entity_pose.entity.name = name
-            entity_pose.entity.type = 2  # MODEL type
-
-            pose = Pose()
-            pose.position.x = data['current_pos'][0]
-            pose.position.y = data['current_pos'][1]
-            pose.position.z = data['current_pos'][2]
-
-            qz = math.sin(data['current_pos'][3] / 2)
-            qw = math.cos(data['current_pos'][3] / 2)
-            pose.orientation.z = qz
-            pose.orientation.w = qw
-
-            entity_pose.pose = pose
-            request.entity_poses.entity_poses.append(entity_pose)
-
-        self.set_pose_vector_client.call_async(request)
-
-    def set_pose(self, x=0, y=0, z=0.5, yaw=0):
-        """Move the box using ROS 2 service (fast!)"""
-        qz = math.sin(yaw / 2)
-        qw = math.cos(yaw / 2)
-        
-        request = SetEntityPose.Request()
-        request.entity.name = self.box_name
-        request.entity.type = 2  # MODEL type
-        
-        request.pose.position.x = x
-        request.pose.position.y = y
-        request.pose.position.z = z
-        request.pose.orientation.x = 0.0
-        request.pose.orientation.y = 0.0
-        request.pose.orientation.z = qz
-        request.pose.orientation.w = qw
-        
-        # Call service asynchronously (non-blocking, very fast!)
-        self.set_pose_client.call_async(request)
     
-    def move_smoothly(self, target_x, target_y, target_z=0.5, target_yaw=0,
-                      current_x=0, current_y=0, current_z=0.5, current_yaw=0,
-                      speed=1.0, update_rate=50):
-        """
-        Move the box smoothly with high update rate - NOW IT WILL WORK!
-        """
-        distance = math.sqrt((target_x - current_x)**2 + (target_y - current_y)**2)
-        duration = distance / speed
-        steps = max(10, int(duration * update_rate))
-        sleep_time = duration / steps
-        
-        self.get_logger().info(f'Moving to ({target_x}, {target_y}) at {speed} m/s with {steps} steps @ {update_rate} Hz')
-        
-        for i in range(steps + 1):
-            t = i / steps
-            x = current_x + (target_x - current_x) * t
-            y = current_y + (target_y - current_y) * t
-            z = current_z + (target_z - current_z) * t
-            # Interpolate yaw
-            yaw_diff = target_yaw - current_yaw
-            while yaw_diff > math.pi:
-                yaw_diff -= 2 * math.pi
-            while yaw_diff < -math.pi:
-                yaw_diff += 2 * math.pi
-            yaw = current_yaw + yaw_diff * t
-            
-            self.set_pose(x, y, z, yaw)
-            
-            if i < steps:
-                time.sleep(sleep_time)
-        
-        self.get_logger().info('Movement complete!')
-        return target_x, target_y, target_z, target_yaw
     
     def move_all_foxes_step(self, dt=0.05):
         """Move all foxes one step toward their next waypoint"""
@@ -271,9 +166,9 @@ class FoxManagerNode(Node):
         req.pose.orientation.w = qw
         self.set_pose_client.call_async(req)
 
-    def remove_box(self):
-        """Remove the box using the Ignition remove service"""
-        req = f'type: MODEL; name: "{self.box_name}"'
+    def remove_fox(self, fox_name):
+        """Remove a specific fox by name"""
+        req = f'type: MODEL; name: "{fox_name}"'
         cmd = [
             "ign", "service", "-s", f"/world/{self.world}/remove",
             "--reqtype", "ignition.msgs.Entity",
@@ -281,9 +176,160 @@ class FoxManagerNode(Node):
             "--timeout", "5000",
             "--req", req
         ]
-        print(f"[BoxManager] Removing box '{self.box_name}'...")
-        subprocess.run(cmd)
-        print("[BoxManager] Box removed.")
+        print(f"[FoxManager] Removing fox '{fox_name}'...")
+        subprocess.run(cmd, capture_output=True)
+        print("[FoxManager] Fox removed.")
+
+
+    def shootCallback(self, msg):
+
+        xPose = msg.x
+        yPose = msg.y
+
+        closestFox = None
+
+        ## FIND OUT WHCIH FOX WAS SHOT
+        for fox_name, fox_data in self.foxes.items():
+            fx, fy, _, _ = fox_data['current_pos']
+            distance = math.sqrt((xPose - fx)**2 + (yPose - fy)**2)
+                
+            if distance < 0.1:
+            
+                closestFox = fox_name
+        
+        if closestFox:
+            self.get_logger().info(f'Shot detected! Hit fox: {closestFox}')
+            self.killFox(closestFox)
+        else:
+            self.get_logger().info(f'Shot detected! But did not hit a fox!')
+            for name, data in self.foxes.items():
+                self.get_logger().info(f"{name} current_pos: {data['current_pos']}")
+
+            # @TODO ADD IN CALL TO ESTOP HERE
+    
+    def euler_to_quaternion(self, roll, pitch, yaw):
+        """
+        Convert Euler angles (roll, pitch, yaw) to a quaternion (x, y, z, w).
+        Roll, pitch, yaw are in radians.
+        """
+        cy = math.cos(yaw * 0.5)
+        sy = math.sin(yaw * 0.5)
+        cp = math.cos(pitch * 0.5)
+        sp = math.sin(pitch * 0.5)
+        cr = math.cos(roll * 0.5)
+        sr = math.sin(roll * 0.5)
+
+        qx = sr * cp * cy - cr * sp * sy
+        qy = cr * sp * cy + sr * cp * sy
+        qz = cr * cp * sy - sr * sp * cy
+        qw = cr * cp * cy + sr * sp * sy
+
+        return qx, qy, qz, qw
+
+    def killFox(self, hitFox):
+
+        fox = self.foxes[hitFox]
+        fox['shot'] = True
+        steps = 50
+
+        cx, cy, cz, cyaw = fox['current_pos']
+
+        roll = 0.0
+        pitch = math.pi/2
+        yaw = cyaw
+        current_roll = 0.0
+        current_pitch = 0.0
+
+        roll_step = (roll - 0.0) / steps
+        pitch_step = (pitch - current_pitch) / steps
+
+        for i in range(1, steps + 1):
+            roll = current_roll + roll_step * i
+            pitch = current_pitch + pitch_step * i
+
+            # Convert to quaternion
+            qx, qy, qz, qw = self.euler_to_quaternion(roll, pitch, yaw)
+
+            # Send pose
+            req = SetEntityPose.Request()
+            req.entity.name = hitFox
+            req.entity.type = 2  # MODEL
+            req.pose.position.x = cx
+            req.pose.position.y = cy
+            req.pose.position.z = cz
+            req.pose.orientation.x = qx
+            req.pose.orientation.y = qy
+            req.pose.orientation.z = qz
+            req.pose.orientation.w = qw
+            self.set_pose_client.call_async(req)
+
+            # Update internal state
+            fox['current_pos'] = [cx, cy, cz, yaw]
+
+            # Small delay between steps
+            time.sleep(0.05)
+        
+        dead_name = f"{hitFox}_dead"
+        self.spawn_fox_model(dead_name, cx, cy, cz, roll=0.0, pitch=math.pi/2, yaw=cyaw)
+        self.remove_fox(hitFox)
+        time.sleep(2)
+        self.remove_fox(dead_name)
+
+        self.get_logger().info(f"{hitFox} has gradually fallen and is now lying down.")
+    
+    
+        
+    def set_pose_with_rotation(self, fox_name, x, y, z, roll, pitch, yaw):
+        """Set pose with full 3D rotation (roll, pitch, yaw)"""
+        # Convert Euler angles to quaternion
+        cy = math.cos(yaw * 0.5)
+        sy = math.sin(yaw * 0.5)
+        cp = math.cos(pitch * 0.5)
+        sp = math.sin(pitch * 0.5)
+        cr = math.cos(roll * 0.5)
+        sr = math.sin(roll * 0.5)
+
+        qw = cr * cp * cy + sr * sp * sy
+        qx = sr * cp * cy - cr * sp * sy
+        qy = cr * sp * cy + sr * cp * sy
+        qz = cr * cp * sy - sr * sp * cy
+
+        req = SetEntityPose.Request()
+        req.entity.name = fox_name
+        req.entity.type = 2  # MODEL
+        req.pose.position.x = x
+        req.pose.position.y = y
+        req.pose.position.z = z
+        req.pose.orientation.x = qx
+        req.pose.orientation.y = qy
+        req.pose.orientation.z = qz
+        req.pose.orientation.w = qw
+
+        self.set_pose_client.call_async(req)
+        
+    def spawn_fox_model(self, fox_name, x, y, z, roll=0.0, pitch=0.0, yaw=0.0):
+        """Spawn a fox using a specific SDF model at a given pose."""
+        qx, qy, qz, qw = self.euler_to_quaternion(roll, pitch, yaw)
+        sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model_dead.sdf"
+
+        req = (
+            f'name: "{fox_name}"; '
+            f'sdf_filename: "{sdf_path}"; '
+            f'pose: {{position: {{x: {x}, y: {y}, z: {z}}}, '
+            f'orientation: {{x: {qx}, y: {qy}, z: {qz}, w: {qw}}}}}'
+        )
+
+        cmd = [
+            "ign", "service", "-s", f"/world/{self.world}/create",
+            "--reqtype", "ignition.msgs.EntityFactory",
+            "--reptype", "ignition.msgs.Boolean",
+            "--timeout", "5000",
+            "--req", req
+        ]
+
+        subprocess.run(cmd, capture_output=True)
+        print(f"[FoxManager] Spawned '{fox_name}' from {sdf_path} at ({x:.2f}, {y:.2f}, {z:.2f})")
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -297,35 +343,36 @@ def main(args=None):
     # Give bridge time to start
     time.sleep(3)
     
-    # Spawn the box
-    # manager.spawnFox(x=0, y=0, z=0.5)
+    # Spawn all foxes
     manager.spawnAllFoxes()
     time.sleep(2)
-    current_pos = [0, 0, 0.5, 0]
     
-    # while not manager.shot: 
-
-    #     for pos in manager.waypoints:
-            
-    #         if manager.shot:
-    #             break
-            
-    #         current_pos = manager.move_smoothly(target_x=pos[0], target_y=pos[1], target_z=0, target_yaw=math.pi/4,
-    #                                             current_x=current_pos[0], current_y=current_pos[1],
-    #                                             current_z=current_pos[2], current_yaw=current_pos[3],
-    #                                             speed=1.0, update_rate=50)
-  
-    #     time.sleep(3)
-  
-    # manager.remove_box()
-    # After spawning
-
+    # TEST: Simulate a shot after 5 seconds
+    def test_shot():
+        time.sleep(5)
+        # Get foxy1's position and shoot near it
+        fx, fy, _, _ = manager.foxes['foxy1']['current_pos']
+        
+        # Publish a shot at foxy1's location
+        from geometry_msgs.msg import Point
+        shot_msg = Point()
+        shot_msg.x = fx   # Slightly offset
+        shot_msg.y = fy 
+        shot_msg.z = 1.0  # Detection threshold
+        
+        manager.get_logger().info(f'TEST: Firing shot at ({shot_msg.x}, {shot_msg.y})')
+        manager.shootCallback(shot_msg)
+    
+    # Uncomment to test
+    threading.Thread(target=test_shot, daemon=True).start()
+    
     # Movement loop
-    while rclpy.ok():
-        manager.move_all_foxes_step(dt=0.05)
-        time.sleep(0.05)
-
-
+    try:
+        while rclpy.ok():
+            manager.move_all_foxes_step(dt=0.05)
+            time.sleep(0.05)
+    except KeyboardInterrupt:
+        print("\n[FoxManager] Shutting down...")
     
     manager.destroy_node()
     rclpy.shutdown()
