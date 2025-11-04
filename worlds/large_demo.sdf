@@ -140,7 +140,7 @@
       <pose>+9.32 12.5 2 1.570796 0 0</pose>
     </include>
 
-    <!-- Oak trees
+    <!-- Oak trees -->
     <include>
       <uri>
         https://fuel.gazebosim.org/1.0/OpenRobotics/models/Oak%20tree
@@ -168,10 +168,10 @@
       </uri>
       <name>oak6</name>
       <pose>-4.33701 1.32854 -0.3 0 -0 0</pose>
-    </include> -->
+    </include>
    
     <!-- Pine trees -->
-    <!-- <include>
+    <include>
       <uri>
         https://fuel.gazebosim.org/1.0/OpenRobotics/models/Pine%20tree
       </uri>
@@ -184,7 +184,7 @@
       </uri>
       <name>pine6</name>
       <pose>-2.27195 -8.68441 0 0 -0 0.9</pose>
-    </include> -->
+    </include>
 
     <!-- Rocks -->
     <include>

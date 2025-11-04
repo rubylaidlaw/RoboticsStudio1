@@ -93,7 +93,9 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
-            '/world/large_demo/set_pose@ros_gz_interfaces/srv/SetEntityPose'
+            '/world/large_demo/set_pose@ros_gz_interfaces/srv/SetEntityPose',
+            '/world/large_demo/create@ros_gz_interfaces/srv/SpawnEntity',
+            '/world/large_demo/remove@ros_gz_interfaces/srv/DeleteEntity'
         ],
         output='screen',
         name='set_pose_bridge'
