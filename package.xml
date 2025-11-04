@@ -20,6 +20,13 @@
   <!-- Other -->
   <depend>robot_localization</depend>
 
+  <!-- Python + vision dependencies for fox detector -->
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>OpenCV</depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

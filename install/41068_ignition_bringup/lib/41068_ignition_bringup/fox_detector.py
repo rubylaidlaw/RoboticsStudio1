@@ -1,0 +1,1 @@
+/home/student/RoboticsStudio1-new/scripts/fox_detector.py

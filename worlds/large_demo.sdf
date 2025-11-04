@@ -29,12 +29,24 @@
       <real_time_factor>1</real_time_factor>
       <real_time_update_rate>100</real_time_update_rate>
     </physics>
+    <!-- Nighttime lighting setup -->
     <scene>
-      <ambient>0.1 0.1 0.2 1</ambient>
-      <background>0.05 0.05 0.2 1</background>
+      <ambient>0.05 0.05 0.1 1</ambient> <!-- Cool blue night tone -->
+      <background>0.02 0.02 0.05 1</background>
       <shadows>0</shadows>
       <grid>0</grid>
     </scene>
+
+    <!-- Dim moonlight for soft scene visibility -->
+    <light name="moonlight" type="directional">
+      <pose>0 0 100 0 0 0</pose>
+      <diffuse>0.1 0.1 0.3 1</diffuse>  <!-- Slight blue -->
+      <specular>0.1 0.1 0.2 1</specular>
+      <direction>-0.4 0.3 -1</direction>
+      <intensity>0.4</intensity>         <!-- Dimmer than sunlight -->
+      <cast_shadows>false</cast_shadows>
+    </light>
+
 
     <!-- Initialise spherical coordinates somewhere -->
     <spherical_coordinates>

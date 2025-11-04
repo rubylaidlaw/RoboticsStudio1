@@ -68,3 +68,9 @@
   gz_type_name: "ignition.msgs.PointCloudPacked"
   direction: GZ_TO_ROS
 
+  # Camera calibration info (needed for fox_detector projection)
+- ros_topic_name: "/camera/camera_info"
+  gz_topic_name: "/model/husky/camera/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "ignition.msgs.CameraInfo"
+  direction: GZ_TO_ROS
