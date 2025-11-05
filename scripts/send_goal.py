@@ -8,6 +8,7 @@ from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 from std_msgs.msg import Bool, Float32
 import numpy as np
 import random
+from geometry_msgs.msg import PointStamped
 
 class Estop:
     def __init__(self):
@@ -55,17 +56,34 @@ class RobotNavigator(Node):
         self.waypoint_manager = WaypointManager()
         self.estop = Estop()
         self.current_goal = None
+        
+        # Fox target state
+        self.fox_detected = False
+        self.fox_target_point = None
+        
+        # Subscriptions
         self.estop_subscription = self.create_subscription(
             Bool,
             '/estop_status',
             self.estop_callback,
             10
         )
-        self.get_logger().info("Robot Navigator initialized, listening for e-stop...")
+        self.fox_target_subscription = self.create_subscription(
+            PointStamped,
+            '/fox_target',
+            self.fox_target_callback,
+            10
+        )
+        
+        self.get_logger().info("Robot Navigator initialized, listening to e-stop and fox target...")
         self.distance_pub = self.create_publisher(Float32, '/distance_to_goal', 10)
 
     def estop_callback(self, msg: Bool):
         self.estop.set_estop(msg.data)
+
+    def fox_target_callback(self, msg: PointStamped):
+        self.fox_target_point = msg
+        self.fox_detected = True
 
     def get_quaternion_from_yaw(self, yaw):
         return [0.0, 0.0, np.sin(yaw / 2), np.cos(yaw / 2)]
@@ -81,9 +99,17 @@ class RobotNavigator(Node):
         pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w = q
         return pose
 
-    def navigate_with_estop_support(self, goal_pose, description=""):
+    def distance_to_goal(self, goal_pose):
+        current_pose = self.navigator.get_pose()
+        if current_pose is None:
+            return float('inf')
+        dx = current_pose.pose.position.x - goal_pose.pose.position.x
+        dy = current_pose.pose.position.y - goal_pose.pose.position.y
+        return (dx ** 2 + dy ** 2) ** 0.5
+
+    def navigate_to_goal(self, goal_pose, description=""):
         self.current_goal = goal_pose
-        print(f"Navigating to {description}")
+        # print(f"Navigating to {description}")
         self.navigator.goToPose(goal_pose)
         last_print_time = 0
 
@@ -98,7 +124,7 @@ class RobotNavigator(Node):
 
             current_time = time.time()
             if current_time - last_print_time > 1.0:
-                print(f"Distance to {description}: {dist:.2f} meters")
+                # print(f"Distance to {description}: {dist:.2f} meters")
                 last_print_time = current_time
 
             if self.estop.is_active():
@@ -108,13 +134,20 @@ class RobotNavigator(Node):
                 print(f"E-Stop released. Resuming navigation to {description}")
                 self.navigator.goToPose(self.current_goal)
 
-            # Generate and move to a new waypoint if close enough
-            if dist < 2.0:
+            # If fox detected during navigation, switch immediately
+            if self.fox_detected:
+                print("Fox detected! Switching to fox target...")
+                self.navigator.cancelTask()
+                break
+
+            # For random waypoint navigation, generate next waypoint if close enough
+            if dist < 2.0 and not self.fox_detected:
                 waypoint = self.waypoint_manager.get_next_waypoint()
                 new_goal_pose = self.create_pose(waypoint[0], waypoint[1], self.current_yaw)
                 self.navigator.goToPose(new_goal_pose)
-                self.current_goal = new_goal_pose  # Update current_goal for feedback
+                self.current_goal = new_goal_pose
                 description = f"waypoint {waypoint}"
+
             rclpy.spin_once(self, timeout_sec=0.1)
 
         result = self.navigator.getResult()
@@ -127,22 +160,25 @@ class RobotNavigator(Node):
         return result
 
     def run_navigation(self):
-        # Go to home position initially
         init_pose = self.create_pose(0.0, 0.0, 0.0)
-        self.navigate_with_estop_support(init_pose, "home position (0,0)")
+        self.navigate_to_goal(init_pose, "home position (0,0)")
 
-        # Start with first waypoint
-        first_waypoint = self.waypoint_manager.get_next_waypoint()
-        first_goal_pose = self.create_pose(first_waypoint[0], first_waypoint[1], self.current_yaw)
-        self.navigate_with_estop_support(first_goal_pose, f"Initial waypoint {first_waypoint}")
+        while rclpy.ok():
+            if self.fox_detected and self.fox_target_point:
+                # Follow fox_target
+                x = self.fox_target_point.point.x
+                y = self.fox_target_point.point.y
+                # Optionally consider z if needed
+                fox_pose = self.create_pose(x, y, self.current_yaw)
+                self.navigate_to_goal(fox_pose, "fox target")
 
-    def distance_to_goal(self, goal_pose):
-        current_pose = self.navigator.get_pose()
-        if current_pose is None:
-            return float('inf')
-        dx = current_pose.pose.position.x - goal_pose.pose.position.x
-        dy = current_pose.pose.position.y - goal_pose.pose.position.y
-        return (dx**2 + dy**2)**0.5
+                # Reset fox_detected to wait for new target update
+                self.fox_detected = False
+            else:
+                # Follow random waypoints
+                waypoint = self.waypoint_manager.get_next_waypoint()
+                waypoint_pose = self.create_pose(waypoint[0], waypoint[1], self.current_yaw)
+                self.navigate_to_goal(waypoint_pose, f"waypoint {waypoint}")
 
 def main():
     rclpy.init()

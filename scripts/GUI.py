@@ -42,7 +42,8 @@ class RobotLauncher(tk.Tk):
         self.ros_node = None
         self.init_ros()
         self.create_widgets()
-        self.project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Ensure this is the workspace root: ~/41068_ws
+        self.project_root = os.path.dirname(os.path.abspath(__file__))
 
     def init_ros(self):
         try:
@@ -154,21 +155,28 @@ class RobotLauncher(tk.Tk):
             print("Simulation already running!")
             return
 
-        terminal = self.get_terminal_emulator()
-        if terminal is None:
+        terminal = 'xterm'
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        setup_bash = "/opt/ros/humble/setup.bash"
+        ws_setup_bash = os.path.join(root, "install", "setup.bash")
+        launch_file = os.path.join(root, "launch", "41068_ignition.launch.py")
+        rviz_config = os.path.join(root, "config", "41068.rviz")
+
+        if not os.path.exists(setup_bash):
             self.status_label.config(
-                text="Status: Error - No terminal found",
+                text="Status: Error - ROS2 Humble not installed",
                 foreground="red"
             )
-            print("Error: No terminal emulator found!")
+            return
+        if not os.path.exists(launch_file):
+            self.status_label.config(
+                text="Status: Error - Launch file not found",
+                foreground="red"
+            )
             return
 
-        setup_bash = "/opt/ros/humble/setup.bash"
-        ws_setup_bash = os.path.join(self.project_root, "install", "setup.bash")
-        launch_file = os.path.join(self.project_root, "launch", "41068_ignition.launch.py")
-        rviz_config = os.path.join(self.project_root, "config", "41068.rviz")
-
         launch_cmd = (
+            f"cd {root} && colcon build --symlink-install && "
             f"source {setup_bash} && "
             f"source {ws_setup_bash} && "
             "export LIBGL_ALWAYS_SOFTWARE=1 && "
@@ -176,26 +184,14 @@ class RobotLauncher(tk.Tk):
             "slam:=true nav2:=true rviz:=true "
             f"rviz_config:={rviz_config} world:=large_demo; exec bash"
         )
-        if terminal == 'gnome-terminal':
-            cmd = [terminal, '--', 'bash', '-c', launch_cmd]
-        elif terminal == 'konsole':
-            cmd = [terminal, '-e', 'bash', '-c', launch_cmd]
-        elif terminal in ['xfce4-terminal', 'xterm', 'terminator']:
-            cmd = [terminal, '-e', f'bash -c "{launch_cmd}"']
-        else:
-            cmd = [terminal, '-e', 'bash', '-c', launch_cmd]
+        cmd = [terminal, '-e', f'bash -c "{launch_cmd}"']
 
-        self.simulation_process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-
+        self.simulation_process = subprocess.Popen(cmd)
         self.launch_button.config(state="disabled")
         self.stop_button.config(state="normal")
         self.nav_button.config(state="normal")
         self.status_label.config(text="Status: Running", foreground="green")
-        print(f"Simulation launched successfully using {terminal}!")
+
 
     def stop_simulation(self):
         if self.simulation_process is not None:
@@ -214,7 +210,7 @@ class RobotLauncher(tk.Tk):
             self.status_label.config(text="Status: Not Running", foreground="red")
             print("Simulation stopped")
 
-            reset_script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reset.sh")
+            reset_script_path = os.path.join(self.project_root, "reset.sh")
             subprocess.Popen(['bash', reset_script_path])
             print("Reset script executed.")
 
@@ -222,11 +218,9 @@ class RobotLauncher(tk.Tk):
         if self.nav_process is not None and self.nav_process.poll() is None:
             print("Navigation already running.")
             return
-        send_goal_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "send_goal.py")
+        send_goal_script = os.path.join(self.project_root, "send_goal.py")
         self.nav_process = subprocess.Popen(
-            ['python3', send_goal_script],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            ['python3', send_goal_script]
         )
         print("Navigation started")
 
