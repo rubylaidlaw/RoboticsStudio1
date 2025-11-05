@@ -10,6 +10,7 @@ from geometry_msgs.msg import Point
 import subprocess
 import threading
 import random
+import os
 
 class FoxManagerNode(Node):
     
@@ -18,7 +19,10 @@ class FoxManagerNode(Node):
      
         self.world = "large_demo"
         self.box_name = "fox"
-        self.sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model.sdf"
+        # root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # self.sdf_path = os.path.join(root, "models", "fox", "model.sdf")
+        self.sdf_path = "fox/model.sdf"
+        #  self.sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model.sdf"
         self.shot = False
         # Create service client
         self.set_pose_client = self.create_client(SetEntityPose,

@@ -34,7 +34,7 @@ class RobotLauncher(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Foxtrack Rover Control")
-        self.geometry("500x675")
+        self.geometry("500x600")
         self.estop_active = False
         self.simulation_process = None
         self.nav_process = None
@@ -42,7 +42,7 @@ class RobotLauncher(tk.Tk):
         self.ros_node = None
         self.init_ros()
         self.create_widgets()
-        self.project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.project_root = os.path.dirname(os.path.abspath(__file__))
 
     def init_ros(self):
         try:
@@ -122,17 +122,6 @@ class RobotLauncher(tk.Tk):
         )
         self.nav_button.pack(pady=5)
 
-        terminal_frame = ttk.LabelFrame(self, text="New Terminal", padding=10)
-        terminal_frame.pack(pady=10, padx=20, fill="x")
-
-        self.open_terminal_button = ttk.Button(
-            terminal_frame, 
-            text="Open New Terminal", 
-            command=self.open_new_terminal,
-            width=30
-        )
-        self.open_terminal_button.pack(pady=5)
-
         dist_frame = ttk.LabelFrame(self, text="Distance to goal", padding=10)
         dist_frame.pack(pady=10, padx=20, fill="x")
 
@@ -154,48 +143,45 @@ class RobotLauncher(tk.Tk):
             print("Simulation already running!")
             return
 
-        terminal = self.get_terminal_emulator()
-        if terminal is None:
+        terminal = 'xterm'
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        setup_bash = "/opt/ros/humble/setup.bash"
+        ws_setup_bash = os.path.join(root, "install", "setup.bash")
+        launch_file = os.path.join(root, "launch", "41068_ignition.launch.py")
+        rviz_config = os.path.join(root, "config", "41068.rviz")
+        models_path = os.path.join(root, "models")
+
+        if not os.path.exists(setup_bash):
             self.status_label.config(
-                text="Status: Error - No terminal found",
+                text="Status: Error - ROS2 Humble not installed",
                 foreground="red"
             )
-            print("Error: No terminal emulator found!")
+            return
+        if not os.path.exists(launch_file):
+            self.status_label.config(
+                text="Status: Error - Launch file not found",
+                foreground="red"
+            )
             return
 
-        setup_bash = "/opt/ros/humble/setup.bash"
-        ws_setup_bash = os.path.join(self.project_root, "install", "setup.bash")
-        launch_file = os.path.join(self.project_root, "launch", "41068_ignition.launch.py")
-        rviz_config = os.path.join(self.project_root, "config", "41068.rviz")
-
         launch_cmd = (
+            f"cd {root} && colcon build --symlink-install && "
             f"source {setup_bash} && "
             f"source {ws_setup_bash} && "
             "export LIBGL_ALWAYS_SOFTWARE=1 && "
+            f"export IGN_GAZEBO_RESOURCE_PATH=$IGN_GAZEBO_RESOURCE_PATH:{models_path} && "
             f"ros2 launch {launch_file} "
             "slam:=true nav2:=true rviz:=true "
             f"rviz_config:={rviz_config} world:=large_demo; exec bash"
         )
-        if terminal == 'gnome-terminal':
-            cmd = [terminal, '--', 'bash', '-c', launch_cmd]
-        elif terminal == 'konsole':
-            cmd = [terminal, '-e', 'bash', '-c', launch_cmd]
-        elif terminal in ['xfce4-terminal', 'xterm', 'terminator']:
-            cmd = [terminal, '-e', f'bash -c "{launch_cmd}"']
-        else:
-            cmd = [terminal, '-e', 'bash', '-c', launch_cmd]
+        cmd = [terminal, '-e', f'bash -c "{launch_cmd}"']
 
-        self.simulation_process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-
+        self.simulation_process = subprocess.Popen(cmd)
         self.launch_button.config(state="disabled")
         self.stop_button.config(state="normal")
         self.nav_button.config(state="normal")
         self.status_label.config(text="Status: Running", foreground="green")
-        print(f"Simulation launched successfully using {terminal}!")
+
 
     def stop_simulation(self):
         if self.simulation_process is not None:
@@ -214,7 +200,7 @@ class RobotLauncher(tk.Tk):
             self.status_label.config(text="Status: Not Running", foreground="red")
             print("Simulation stopped")
 
-            reset_script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reset.sh")
+            reset_script_path = os.path.join(self.project_root, "reset.sh")
             subprocess.Popen(['bash', reset_script_path])
             print("Reset script executed.")
 
@@ -222,11 +208,9 @@ class RobotLauncher(tk.Tk):
         if self.nav_process is not None and self.nav_process.poll() is None:
             print("Navigation already running.")
             return
-        send_goal_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "send_goal.py")
+        send_goal_script = os.path.join(self.project_root, "send_goal.py")
         self.nav_process = subprocess.Popen(
-            ['python3', send_goal_script],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            ['python3', send_goal_script]
         )
         print("Navigation started")
 
@@ -242,13 +226,6 @@ class RobotLauncher(tk.Tk):
             print("Emergency Stop released")
         if self.ros_node is not None:
             self.ros_node.publish_estop(self.estop_active)
-
-    def open_new_terminal(self):
-        terminal = self.get_terminal_emulator()
-        if terminal is not None:
-            subprocess.Popen([terminal])
-        else:
-            print("No terminal emulator found!")
 
     def on_closing(self):
         if self.simulation_process is not None:
