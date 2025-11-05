@@ -98,3 +98,31 @@ I found [this thread](https://robotics.stackexchange.com/questions/111547/gazebo
 ```bash
 export QT_QPA_PLATFORM=xcb
 ```
+
+### fox_detector.py Node
+Detects red objects (foxes) in the RGB camera feed, estimates their 3D position using the depth image and camera calibration.
+When a colour image is recieved the code: 
+1. Converts the image to Hue, Saturation, Value (HSV) colour space
+2. Thresholds all red hues (0–25° on the HSV wheel)
+3. Finds contours of red regions
+4. Selects the largest red region (assuming one fox)
+5. Gets the depth value from the same pixel location in the depth image
+6. Uses the camera intrinsic parameters to project the 2D pixel to a 3D position in the camera frame
+
+The fox deetector node publishes: 
+1. /fox_target — the fox’s 3D coordinates.
+2. /fox_marker — a visualization marker for RViz (green sphere).
+
+The fox detector node subscibes to:
+1. /camera/image -- sensor_msgs/msg/Image (RGB image used to detect red colour)
+2. /camera/depth/image -- sensor_msgs/msg/Image (Depth image used to estimate how far the fox is)
+3. /camera/camera_info -- sensor_msgs/msg/CameraInfo (Camera calibration used for 3D projection)
+
+### Integrating with fox following (for Liam) 
+The fox following node subscribes to /fox_target (Type: geometry_msgs/PointStamped):
+1. create a subscriber node that listens for new fox positions
+SOMETHING LIKE THIS --> self.create_subscription(PointStamped, '/fox_target', self.WHATEVERYOUWANTTOCALLIT, 10)
+2. This will give you the 3D position of the fox 
+3. Convert it to a Robot command 
+
+

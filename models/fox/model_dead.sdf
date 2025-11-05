@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="fox">
+    <pose>0 0 0 0 0 0</pose>
+    <link name="body">
+      <inertial>
+        <mass>5.0</mass>
+        <inertia>
+          <ixx>0.1</ixx>
+          <iyy>0.1</iyy>
+          <izz>0.1</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/meshes/veryperfectfoxcolour.stl</uri>
+            <scale>1.0 1.0 1.0</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>package://install/41068_ignition_bringup/share/41068_ignition_bringup/models/fox/meshes/veryperfectfoxcolour.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+            <ambient>1.0 1.0 1.0 0.5</ambient>
+            <diffuse>1.0 1.0 1.0 0.5</diffuse>
+            <specular>0.5 0.5 0.5 0.5</specular>
+            <emissive>1.0 1.0 1.0 0.5</emissive>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
