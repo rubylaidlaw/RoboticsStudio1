@@ -34,7 +34,7 @@ class RobotLauncher(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Foxtrack Rover Control")
-        self.geometry("500x675")
+        self.geometry("500x600")
         self.estop_active = False
         self.simulation_process = None
         self.nav_process = None
@@ -42,7 +42,6 @@ class RobotLauncher(tk.Tk):
         self.ros_node = None
         self.init_ros()
         self.create_widgets()
-        # Ensure this is the workspace root: ~/41068_ws
         self.project_root = os.path.dirname(os.path.abspath(__file__))
 
     def init_ros(self):
@@ -122,17 +121,6 @@ class RobotLauncher(tk.Tk):
             width=30
         )
         self.nav_button.pack(pady=5)
-
-        terminal_frame = ttk.LabelFrame(self, text="New Terminal", padding=10)
-        terminal_frame.pack(pady=10, padx=20, fill="x")
-
-        self.open_terminal_button = ttk.Button(
-            terminal_frame, 
-            text="Open New Terminal", 
-            command=self.open_new_terminal,
-            width=30
-        )
-        self.open_terminal_button.pack(pady=5)
 
         dist_frame = ttk.LabelFrame(self, text="Distance to goal", padding=10)
         dist_frame.pack(pady=10, padx=20, fill="x")
@@ -238,13 +226,6 @@ class RobotLauncher(tk.Tk):
             print("Emergency Stop released")
         if self.ros_node is not None:
             self.ros_node.publish_estop(self.estop_active)
-
-    def open_new_terminal(self):
-        terminal = self.get_terminal_emulator()
-        if terminal is not None:
-            subprocess.Popen([terminal])
-        else:
-            print("No terminal emulator found!")
 
     def on_closing(self):
         if self.simulation_process is not None:
