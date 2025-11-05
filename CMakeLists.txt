@@ -8,11 +8,17 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 
+find_package(ros_gz_interfaces REQUIRED)
 find_package(ros_ign_interfaces REQUIRED)
 
 install(
   DIRECTORY config launch models urdf worlds
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(PROGRAMS 
+  scripts/projectile_launch.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

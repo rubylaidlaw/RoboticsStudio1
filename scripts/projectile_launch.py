@@ -1,17 +1,3 @@
-
-
-
-# Subscribe to Fox Poses recieved from Lidar Sensor 
-
-# Shoot Laser of Projectile towards Pose Towards Pose
-    # Spawns projectile in barrel of Harpoon
-    # Apply a force or velocity towards the target - using ApplyJointEffor or ApplyBodyWrench in Ignition
-    # OR More simply simulating lazer beam from barrel
-        # ROS2 laser
-        # Use Gazebo/Rignition Raycasting    
-
-# Mark the pose for where the object was struck
-
 #!/usr/bin/env python3
 import rclpy # ROS 2 Python client library 
 from rclpy.node import Node # ROS 2 Python Base class for nodes
@@ -152,3 +138,15 @@ class HarpoonLaserNode(Node):
             rclpy.spin(node) # Spins the node (keeps it alive to process callbacks).
             node.destroy_node() # On shutdown, destroys the node 
             rclpy.shutdown() # Shuts down ROS2 cleanly.
+
+
+# Subscribe to Fox Poses recieved from Lidar Sensor 
+
+# Shoot Laser of Projectile towards Pose Towards Pose
+    # Spawns projectile in barrel of Harpoon
+    # Apply a force or velocity towards the target - using ApplyJointEffor or ApplyBodyWrench in Ignition
+    # OR More simply simulating lazer beam from barrel
+        # ROS2 laser
+        # Use Gazebo/Rignition Raycasting    
+
+# Mark the pose for where the object was struck
