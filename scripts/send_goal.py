@@ -163,19 +163,24 @@ class RobotNavigator(Node):
         init_pose = self.create_pose(0.0, 0.0, 0.0)
         self.navigate_to_goal(init_pose, "home position (0,0)")
 
-        while rclpy.ok():
-            if self.fox_detected and self.fox_target_point:
-                # Follow fox_target
-                x = self.fox_target_point.point.x
-                y = self.fox_target_point.point.y
-                # Optionally consider z if needed
-                fox_pose = self.create_pose(x, y, self.current_yaw)
-                self.navigate_to_goal(fox_pose, "fox target")
+        last_update_time = 0
 
-                # Reset fox_detected to wait for new target update
-                self.fox_detected = False
+        while rclpy.ok():
+            current_time = time.time()
+
+            if self.fox_detected and self.fox_target_point:
+                # Update fox target waypoint only every 1 second
+                if current_time - last_update_time >= 1.0:
+                    x = self.fox_target_point.point.x
+                    y = self.fox_target_point.point.y
+                    fox_pose = self.create_pose(x, y, self.current_yaw)
+                    self.navigate_to_goal(fox_pose, "fox target")
+                    last_update_time = current_time
+
+                # Keep fox_detected True here, so it tries to follow as long as fox updates come in
+
             else:
-                # Follow random waypoints
+                # Follow random waypoints as usual
                 waypoint = self.waypoint_manager.get_next_waypoint()
                 waypoint_pose = self.create_pose(waypoint[0], waypoint[1], self.current_yaw)
                 self.navigate_to_goal(waypoint_pose, f"waypoint {waypoint}")

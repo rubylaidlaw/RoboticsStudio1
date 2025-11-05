@@ -161,6 +161,7 @@ class RobotLauncher(tk.Tk):
         ws_setup_bash = os.path.join(root, "install", "setup.bash")
         launch_file = os.path.join(root, "launch", "41068_ignition.launch.py")
         rviz_config = os.path.join(root, "config", "41068.rviz")
+        models_path = os.path.join(root, "models")
 
         if not os.path.exists(setup_bash):
             self.status_label.config(
@@ -180,6 +181,7 @@ class RobotLauncher(tk.Tk):
             f"source {setup_bash} && "
             f"source {ws_setup_bash} && "
             "export LIBGL_ALWAYS_SOFTWARE=1 && "
+            f"export IGN_GAZEBO_RESOURCE_PATH=$IGN_GAZEBO_RESOURCE_PATH:{models_path} && "
             f"ros2 launch {launch_file} "
             "slam:=true nav2:=true rviz:=true "
             f"rviz_config:={rviz_config} world:=large_demo; exec bash"
