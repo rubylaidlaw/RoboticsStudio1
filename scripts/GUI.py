@@ -53,11 +53,7 @@ class RobotLauncher(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Foxtrack Rover Control")
-<<<<<<< HEAD
         self.geometry("1100x700")
-=======
-        self.geometry("500x675")
->>>>>>> 3c002498d8a8df05c3ab11520e6423c3ac998d9e
         self.estop_active = False
         self.simulation_process = None
         self.nav_process = None
@@ -106,25 +102,13 @@ class RobotLauncher(tk.Tk):
         title_label = ttk.Label(left_frame, text="Foxtrack Rover Control Panel", font=("Arial", 16, "bold"))
         title_label.pack(pady=20)
 
-<<<<<<< HEAD
         # Launch controls
         launch_frame = ttk.LabelFrame(left_frame, text="Launch Control", padding=10)
         launch_frame.pack(pady=10, fill="x")
-=======
-        launch_frame = ttk.LabelFrame(self, text="Simulation Control", padding=10)
-        launch_frame.pack(pady=10, padx=20, fill="x")
->>>>>>> 3c002498d8a8df05c3ab11520e6423c3ac998d9e
 
         self.launch_button = ttk.Button(
-<<<<<<< HEAD
             launch_frame, text="Launch Simulation",
             command=self.launch_simulation_with_optional_coords, width=30
-=======
-            launch_frame,
-            text="Launch Simulation",
-            command=self.launch_simulation,
-            width=30
->>>>>>> 3c002498d8a8df05c3ab11520e6423c3ac998d9e
         )
         self.launch_button.pack(pady=5)
 
@@ -152,7 +136,6 @@ class RobotLauncher(tk.Tk):
                                     state="disabled", width=30)
         self.nav_button.pack(pady=5)
 
-<<<<<<< HEAD
         # Terminal
         terminal_frame = ttk.LabelFrame(left_frame, text="New Terminal", padding=10)
         terminal_frame.pack(pady=10, fill="x")
@@ -188,28 +171,6 @@ class RobotLauncher(tk.Tk):
         image_frame.rowconfigure(1, weight=1)
         image_frame.columnconfigure(0, weight=1)
 
-=======
-        terminal_frame = ttk.LabelFrame(self, text="New Terminal", padding=10)
-        terminal_frame.pack(pady=10, padx=20, fill="x")
-
-        self.open_terminal_button = ttk.Button(
-            terminal_frame, 
-            text="Open New Terminal", 
-            command=self.open_new_terminal,
-            width=30
-        )
-        self.open_terminal_button.pack(pady=5)
-
-        dist_frame = ttk.LabelFrame(self, text="Distance to goal", padding=10)
-        dist_frame.pack(pady=10, padx=20, fill="x")
-
-        self.distance_label = ttk.Label(dist_frame,
-            text="N/A", 
-            font=("Arial", 12)
-        )
-        self.distance_label.pack(pady=10)
-
->>>>>>> 3c002498d8a8df05c3ab11520e6423c3ac998d9e
     def get_terminal_emulator(self):
         terminals = ['xterm', 'gnome-terminal', 'konsole', 'xfce4-terminal', 'terminator']
         for term in terminals:
