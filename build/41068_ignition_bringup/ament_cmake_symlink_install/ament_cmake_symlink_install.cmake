@@ -316,6 +316,9 @@ ament_cmake_symlink_install_programs("/home/student/RoboticsStudio1-new" PROGRAM
 # install(DIRECTORY "config" "launch" "models" "urdf" "worlds" "DESTINATION" "share/41068_ignition_bringup")
 ament_cmake_symlink_install_directory("/home/student/RoboticsStudio1-new" DIRECTORY "config" "launch" "models" "urdf" "worlds" "DESTINATION" "share/41068_ignition_bringup")
 
+# install(PROGRAMS "scripts/foxManagerNode.py" "scripts/box.py" "DESTINATION" "lib/41068_ignition_bringup")
+ament_cmake_symlink_install_programs("/home/student/RoboticsStudio1-new" PROGRAMS "scripts/foxManagerNode.py" "scripts/box.py" "DESTINATION" "lib/41068_ignition_bringup")
+
 # install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
 ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
 

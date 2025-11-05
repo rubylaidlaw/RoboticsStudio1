@@ -32,6 +32,8 @@ install(PROGRAMS scripts/fox_detector.py
   RENAME fox_detector
 )
 
+
+
 install(
   DIRECTORY config launch models urdf worlds
   DESTINATION share/${PROJECT_NAME}
