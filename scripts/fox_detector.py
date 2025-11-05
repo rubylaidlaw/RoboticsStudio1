@@ -74,9 +74,9 @@ class FoxDetector(Node):
         self.publish_marker(target_msg)
         self.get_logger().info(f" Fox detected at ({target_msg.point.x:.2f}, {target_msg.point.y:.2f}, {target_msg.point.z:.2f})")
 
-        cv2.imshow("Camera Feed", cv_image)
-        cv2.imshow("Red Mask", mask)
-        cv2.waitKey(1)
+        #cv2.imshow("Camera Feed", cv_image)
+        #cv2.imshow("Red Mask", mask)
+        #cv2.waitKey(1)
 
 
     def publish_marker(self, point_msg):
