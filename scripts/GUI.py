@@ -191,7 +191,7 @@ class RobotLauncher(tk.Tk):
             return
 
         launch_cmd = (
-            f"cd {root} && colcon build --symlink-install && "
+            f"cd {root} && rm -rf build/ install/ log/ && colcon build --symlink-install && "
             f"source {setup_bash} && source {ws_setup_bash} && "
             "export LIBGL_ALWAYS_SOFTWARE=1 && "
             f"export IGN_GAZEBO_RESOURCE_PATH=$IGN_GAZEBO_RESOURCE_PATH:{models_path} && "
