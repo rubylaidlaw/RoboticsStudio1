@@ -14,6 +14,9 @@ import threading
 import cv2
 from PIL import Image as PILImage, ImageTk
 
+from ament_index_python.packages import get_package_share_directory
+import os
+
 
 class GuiRosNode(Node):
     def __init__(self, update_callback, update_camera_callback=None):
@@ -63,6 +66,8 @@ class RobotLauncher(tk.Tk):
         self.init_ros()
         self.create_widgets()
 
+        self.project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     def init_ros(self):
         try:
             rclpy.init()
@@ -96,6 +101,10 @@ class RobotLauncher(tk.Tk):
         # Launch Control
         launch_frame = ttk.LabelFrame(left_frame, text="Launch Control", padding=10)
         launch_frame.pack(pady=10, fill="x")
+
+        ttk.Label(launch_frame, text="Number of foxes:").pack(anchor='w')
+        self.num_foxes_entry = ttk.Entry(launch_frame)
+        self.num_foxes_entry.pack(fill='x', pady=5)
 
         self.launch_button = ttk.Button(launch_frame, text="Launch Simulation",
                                         command=self.launch_simulation, width=30)
