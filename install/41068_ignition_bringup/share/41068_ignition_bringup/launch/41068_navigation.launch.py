@@ -1,1 +1,0 @@
-/home/student/ros2_ws/src/RoboticsStudio1/launch/41068_navigation.launch.py
