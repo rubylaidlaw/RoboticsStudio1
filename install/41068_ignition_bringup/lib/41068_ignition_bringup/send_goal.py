@@ -1,1 +1,1 @@
-/home/student/RoboticsStudio1-new/scripts/send_goal.py
+/home/student/ros2_ws/src/RoboticsStudio1/scripts/send_goal.py

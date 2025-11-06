@@ -1,8 +1,8 @@
-# Install script for directory: /home/student/RoboticsStudio1-new
+# Install script for directory: /home/student/ros2_ws/src/RoboticsStudio1
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/student/RoboticsStudio1-new/install/41068_ignition_bringup")
+  set(CMAKE_INSTALL_PREFIX "/home/student/ros2_ws/src/RoboticsStudio1/install/41068_ignition_bringup")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -43,11 +43,11 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  include("/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_symlink_install/ament_cmake_symlink_install.cmake")
+  include("/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_symlink_install/ament_cmake_symlink_install.cmake")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/41068_ignition_bringup" TYPE PROGRAM RENAME "fox_detector" FILES "/home/student/RoboticsStudio1-new/scripts/fox_detector.py")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/41068_ignition_bringup" TYPE PROGRAM RENAME "fox_detector" FILES "/home/student/ros2_ws/src/RoboticsStudio1/scripts/fox_detector.py")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -58,5 +58,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

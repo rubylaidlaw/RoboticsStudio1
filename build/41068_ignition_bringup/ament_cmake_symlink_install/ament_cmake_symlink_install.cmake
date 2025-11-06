@@ -23,7 +23,7 @@ function(ament_cmake_symlink_install_directory cmake_current_source_dir)
 
   # make destination absolute path and ensure that it exists
   if(NOT IS_ABSOLUTE "${ARG_DESTINATION}")
-    set(ARG_DESTINATION "/home/student/RoboticsStudio1-new/install/41068_ignition_bringup/${ARG_DESTINATION}")
+    set(ARG_DESTINATION "/home/student/ros2_ws/src/RoboticsStudio1/install/41068_ignition_bringup/${ARG_DESTINATION}")
   endif()
   if(NOT EXISTS "${ARG_DESTINATION}")
     file(MAKE_DIRECTORY "${ARG_DESTINATION}")
@@ -123,7 +123,7 @@ function(ament_cmake_symlink_install_files cmake_current_source_dir)
 
   # make destination an absolute path and ensure that it exists
   if(NOT IS_ABSOLUTE "${ARG_DESTINATION}")
-    set(ARG_DESTINATION "/home/student/RoboticsStudio1-new/install/41068_ignition_bringup/${ARG_DESTINATION}")
+    set(ARG_DESTINATION "/home/student/ros2_ws/src/RoboticsStudio1/install/41068_ignition_bringup/${ARG_DESTINATION}")
   endif()
   if(NOT EXISTS "${ARG_DESTINATION}")
     file(MAKE_DIRECTORY "${ARG_DESTINATION}")
@@ -181,7 +181,7 @@ function(ament_cmake_symlink_install_programs cmake_current_source_dir)
 
   # make destination an absolute path and ensure that it exists
   if(NOT IS_ABSOLUTE "${ARG_DESTINATION}")
-    set(ARG_DESTINATION "/home/student/RoboticsStudio1-new/install/41068_ignition_bringup/${ARG_DESTINATION}")
+    set(ARG_DESTINATION "/home/student/ros2_ws/src/RoboticsStudio1/install/41068_ignition_bringup/${ARG_DESTINATION}")
   endif()
   if(NOT EXISTS "${ARG_DESTINATION}")
     file(MAKE_DIRECTORY "${ARG_DESTINATION}")
@@ -251,7 +251,7 @@ function(ament_cmake_symlink_install_targets)
 
     # make destination an absolute path and ensure that it exists
     if(NOT IS_ABSOLUTE "${destination}")
-      set(destination "/home/student/RoboticsStudio1-new/install/41068_ignition_bringup/${destination}")
+      set(destination "/home/student/ros2_ws/src/RoboticsStudio1/install/41068_ignition_bringup/${destination}")
     endif()
     if(NOT EXISTS "${destination}")
       file(MAKE_DIRECTORY "${destination}")
@@ -311,52 +311,52 @@ message(STATUS "Execute custom install script")
 # begin of custom install code
 
 # install(PROGRAMS "scripts/fox_detector.py" "scripts/navigation.py" "scripts/send_goal.py" "scripts/GUI.py" "DESTINATION" "lib/41068_ignition_bringup")
-ament_cmake_symlink_install_programs("/home/student/RoboticsStudio1-new" PROGRAMS "scripts/fox_detector.py" "scripts/navigation.py" "scripts/send_goal.py" "scripts/GUI.py" "DESTINATION" "lib/41068_ignition_bringup")
+ament_cmake_symlink_install_programs("/home/student/ros2_ws/src/RoboticsStudio1" PROGRAMS "scripts/fox_detector.py" "scripts/navigation.py" "scripts/send_goal.py" "scripts/GUI.py" "DESTINATION" "lib/41068_ignition_bringup")
 
 # install(DIRECTORY "config" "launch" "models" "urdf" "worlds" "DESTINATION" "share/41068_ignition_bringup")
-ament_cmake_symlink_install_directory("/home/student/RoboticsStudio1-new" DIRECTORY "config" "launch" "models" "urdf" "worlds" "DESTINATION" "share/41068_ignition_bringup")
+ament_cmake_symlink_install_directory("/home/student/ros2_ws/src/RoboticsStudio1" DIRECTORY "config" "launch" "models" "urdf" "worlds" "DESTINATION" "share/41068_ignition_bringup")
 
 # install(PROGRAMS "scripts/foxManagerNode.py" "scripts/box.py" "DESTINATION" "lib/41068_ignition_bringup")
-ament_cmake_symlink_install_programs("/home/student/RoboticsStudio1-new" PROGRAMS "scripts/foxManagerNode.py" "scripts/box.py" "DESTINATION" "lib/41068_ignition_bringup")
+ament_cmake_symlink_install_programs("/home/student/ros2_ws/src/RoboticsStudio1" PROGRAMS "scripts/foxManagerNode.py" "scripts/box.py" "DESTINATION" "lib/41068_ignition_bringup")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/parent_prefix_path/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/parent_prefix_path")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/parent_prefix_path/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/parent_prefix_path")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/parent_prefix_path/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/parent_prefix_path")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/parent_prefix_path/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/parent_prefix_path")
 
 # install(FILES "/opt/ros/humble/share/ament_cmake_core/cmake/environment_hooks/environment/ament_prefix_path.sh" "DESTINATION" "share/41068_ignition_bringup/environment")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/opt/ros/humble/share/ament_cmake_core/cmake/environment_hooks/environment/ament_prefix_path.sh" "DESTINATION" "share/41068_ignition_bringup/environment")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/opt/ros/humble/share/ament_cmake_core/cmake/environment_hooks/environment/ament_prefix_path.sh" "DESTINATION" "share/41068_ignition_bringup/environment")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/ament_prefix_path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/ament_prefix_path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/ament_prefix_path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/ament_prefix_path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
 
 # install(FILES "/opt/ros/humble/share/ament_cmake_core/cmake/environment_hooks/environment/path.sh" "DESTINATION" "share/41068_ignition_bringup/environment")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/opt/ros/humble/share/ament_cmake_core/cmake/environment_hooks/environment/path.sh" "DESTINATION" "share/41068_ignition_bringup/environment")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/opt/ros/humble/share/ament_cmake_core/cmake/environment_hooks/environment/path.sh" "DESTINATION" "share/41068_ignition_bringup/environment")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/path.dsv" "DESTINATION" "share/41068_ignition_bringup/environment")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.bash" "DESTINATION" "share/41068_ignition_bringup")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.bash" "DESTINATION" "share/41068_ignition_bringup")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.bash" "DESTINATION" "share/41068_ignition_bringup")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.bash" "DESTINATION" "share/41068_ignition_bringup")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.sh" "DESTINATION" "share/41068_ignition_bringup")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.sh" "DESTINATION" "share/41068_ignition_bringup")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.sh" "DESTINATION" "share/41068_ignition_bringup")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.sh" "DESTINATION" "share/41068_ignition_bringup")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.zsh" "DESTINATION" "share/41068_ignition_bringup")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.zsh" "DESTINATION" "share/41068_ignition_bringup")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.zsh" "DESTINATION" "share/41068_ignition_bringup")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.zsh" "DESTINATION" "share/41068_ignition_bringup")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.dsv" "DESTINATION" "share/41068_ignition_bringup")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.dsv" "DESTINATION" "share/41068_ignition_bringup")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.dsv" "DESTINATION" "share/41068_ignition_bringup")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/local_setup.dsv" "DESTINATION" "share/41068_ignition_bringup")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/package.dsv" "DESTINATION" "share/41068_ignition_bringup")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_environment_hooks/package.dsv" "DESTINATION" "share/41068_ignition_bringup")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/package.dsv" "DESTINATION" "share/41068_ignition_bringup")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_environment_hooks/package.dsv" "DESTINATION" "share/41068_ignition_bringup")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/packages/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/packages")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/packages/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/packages")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/packages/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/packages")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_index/share/ament_index/resource_index/packages/41068_ignition_bringup" "DESTINATION" "share/ament_index/resource_index/packages")
 
-# install(FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig.cmake" "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig-version.cmake" "DESTINATION" "share/41068_ignition_bringup/cmake")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig.cmake" "/home/student/RoboticsStudio1-new/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig-version.cmake" "DESTINATION" "share/41068_ignition_bringup/cmake")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig.cmake" "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig-version.cmake" "DESTINATION" "share/41068_ignition_bringup/cmake")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig.cmake" "/home/student/ros2_ws/src/RoboticsStudio1/build/41068_ignition_bringup/ament_cmake_core/41068_ignition_bringupConfig-version.cmake" "DESTINATION" "share/41068_ignition_bringup/cmake")
 
-# install(FILES "/home/student/RoboticsStudio1-new/package.xml" "DESTINATION" "share/41068_ignition_bringup")
-ament_cmake_symlink_install_files("/home/student/RoboticsStudio1-new" FILES "/home/student/RoboticsStudio1-new/package.xml" "DESTINATION" "share/41068_ignition_bringup")
+# install(FILES "/home/student/ros2_ws/src/RoboticsStudio1/package.xml" "DESTINATION" "share/41068_ignition_bringup")
+ament_cmake_symlink_install_files("/home/student/ros2_ws/src/RoboticsStudio1" FILES "/home/student/ros2_ws/src/RoboticsStudio1/package.xml" "DESTINATION" "share/41068_ignition_bringup")

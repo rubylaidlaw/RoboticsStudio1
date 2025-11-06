@@ -9,12 +9,20 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
+   
     ld = LaunchDescription()
 
     # Get paths to directories
     pkg_path = FindPackageShare('41068_ignition_bringup')
     config_path = PathJoinSubstitution([pkg_path,
                                        'config'])
+
+    num_foxes_arg = DeclareLaunchArgument(
+        'num_foxes',
+        default_value='4',
+    )
+    ld.add_action(num_foxes_arg)
+    num_foxes = LaunchConfiguration('num_foxes')
 
     # Additional command line arguments
     # Declare launch arguments for spawn position (dynamic)
@@ -93,7 +101,9 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
-            '/world/large_demo/set_pose@ros_gz_interfaces/srv/SetEntityPose'
+            '/world/large_demo/set_pose@ros_gz_interfaces/srv/SetEntityPose',
+            '/world/large_demo/create@ros_gz_interfaces/srv/SpawnEntity',
+            '/world/large_demo/remove@ros_gz_interfaces/srv/DeleteEntity'
         ],
         output='screen',
         name='set_pose_bridge'
@@ -163,7 +173,8 @@ def generate_launch_description():
     spawn_fox = Node(
         package='41068_ignition_bringup',
         executable='foxManagerNode.py',
-        output='screen'
+        output='screen',
+        parameters=[{'num_foxes': num_foxes}]
     )
     ld.add_action(spawn_fox)
 

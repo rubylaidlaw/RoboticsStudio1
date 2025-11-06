@@ -1,1 +1,1 @@
-/home/student/RoboticsStudio1-new/scripts/GUI.py
+/home/student/ros2_ws/src/RoboticsStudio1/scripts/GUI.py

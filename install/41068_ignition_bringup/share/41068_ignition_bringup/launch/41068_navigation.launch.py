@@ -1,1 +1,1 @@
-/home/student/RoboticsStudio1-new/launch/41068_navigation.launch.py
+/home/student/ros2_ws/src/RoboticsStudio1/launch/41068_navigation.launch.py
