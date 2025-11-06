@@ -18,7 +18,10 @@ class FoxManagerNode(Node):
     def __init__(self):
         super().__init__('foxManagerNode')
        
-     
+        self.declare_parameter('num_foxes', 4)
+        self.numFoxes = self.get_parameter('num_foxes').value
+        self.get_logger().info(f'NUMMMMMMMMMMMMMMMMMMMMMMM FOXESSSSSSSSSSSSSSS: {self.numFoxes}')
+
         self.world = "large_demo"
         self.box_name = "fox"
         fox_pkg_share = get_package_share_directory('41068_ignition_bringup')
@@ -45,10 +48,10 @@ class FoxManagerNode(Node):
         self.xmin, self.xmax = -11, 11
         self.ymin, self.ymax = -11, 11
 
-        self.foxes = {
+        allFoxes = {
             'foxy1': {
                 'waypoints': [(-5, 1, 0), (1, 1, 0), (4, -4, 0), (8, 8, 0)],
-                'current_pos': [-5, 1, 0, 0],  # x, y, z, yaw
+                'current_pos': [-5, 1, 0, 0], 
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
@@ -77,8 +80,26 @@ class FoxManagerNode(Node):
                 'speed': 0.5,
                 'shot': False,
                 'death_animation': None
+            },
+            'foxy5': {
+                'waypoints': [(-9, 8, 0), (-5, -5, 0), (8, -5, 0), (2, 2, 0)],
+                'current_pos': [-9, 8, 0, 0],
+                'current_wp_index': 0,
+                'speed': 0.5,
+                'shot': False,
+                'death_animation': None
+            },
+            'foxy6': {
+                'waypoints': [(3, 9, 0), (-4, 3, 0), (2, -1, 0), (-6, -8, 0)],
+                'current_pos': [3, 9, 0, 0],
+                'current_wp_index': 0,
+                'speed': 0.5,
+                'shot': False,
+                'death_animation': None
             }
         }
+
+        self.foxes = dict(list(allFoxes.items())[:self.numFoxes])
 
         self.get_logger().info('FoxManager initialized with shot detection')
 
@@ -179,6 +200,10 @@ class FoxManagerNode(Node):
     
 
     def shootCallback(self, msg):
+        self.get_logger().info("SHOOT CALLBACK*************************************")
+        self.get_logger().info("SHOOT CALLBACK*************************************")
+        self.get_logger().info("SHOOT CALLBACK*************************************")
+        self.get_logger().info("SHOOT POSE************************************* " + str(msg))
 
         xPose = msg.x
         yPose = msg.y
@@ -361,24 +386,24 @@ def main(args=None):
     time.sleep(2)
 
     # TEST: Simulate a shot after 5 seconds
-    def test_shot():
-        time.sleep(5)
-        # Get foxy1's position and shoot near it
-        fx, fy, _, _ = manager.foxes['foxy1']['current_pos']
+    # def test_shot():
+    #     time.sleep(5)
+    #     # Get foxy1's position and shoot near it
+    #     fx, fy, _, _ = manager.foxes['foxy1']['current_pos']
 
-        # Publish a shot at foxy1's location
-        from geometry_msgs.msg import Point
-        shot_msg = Point()
-        shot_msg.x = fx   # Slightly offset
-        shot_msg.y = fy 
-        shot_msg.z = 1.0  # Detection threshold
+    #     # Publish a shot at foxy1's location
+    #     from geometry_msgs.msg import Point
+    #     shot_msg = Point()
+    #     shot_msg.x = fx   # Slightly offset
+    #     shot_msg.y = fy 
+    #     shot_msg.z = 1.0  # Detection threshold
 
-        manager.get_logger().info(f'TEST: Firing shot at ({shot_msg.x}, {shot_msg.y})')
-        manager.shootCallback(shot_msg)
+    #     manager.get_logger().info(f'TEST: Firing shot at ({shot_msg.x}, {shot_msg.y})')
+    #     manager.shootCallback(shot_msg)
 
-    # Uncomment to test
+    # # Uncomment to test
+    # # threading.Thread(target=test_shot, daemon=True).start()
     # threading.Thread(target=test_shot, daemon=True).start()
-    threading.Thread(target=test_shot, daemon=True).start()
 
     # Movement loop
     try:
