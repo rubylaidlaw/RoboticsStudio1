@@ -55,7 +55,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 4.0,
+                'paused': False
             },
             'foxy2': {
                 'waypoints': [(3, 3, 0), (3, -5, 0), (3, -5, 0), (-12, 12, 0)],
@@ -63,7 +64,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 2.0,
+                'paused': False
             },
             'foxy3': {
                 'waypoints': [(-10, -10, 0), (10, -10, 0), (10, 10, 0), (-10, 10, 0)],
@@ -71,7 +73,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 0.0,
+                'paused': False
             },
             'foxy4': {
                 'waypoints': [(-2, -2, 0), (2, -2, 0), (4, -5, 0), (1, -4, 0)],
@@ -79,7 +82,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 6.0,
+                'paused': False
             },
             'foxy5': {
                 'waypoints': [(-9, 8, 0), (-5, -5, 0), (8, -5, 0), (2, 2, 0)],
@@ -87,7 +91,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 8.0,
+                'paused': False
             },
             'foxy6': {
                 'waypoints': [(3, 9, 0), (-4, 3, 0), (2, -1, 0), (-6, -8, 0)],
@@ -95,7 +100,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 10.0,
+                'paused': False
             }
         }
 
@@ -106,8 +112,24 @@ class FoxManagerNode(Node):
     def move_all_foxes_step(self, dt=0.05):
         """Move all foxes one step toward their next waypoint"""
         for fox_name, fox_data in self.foxes.items():
-            if fox_data['shot']:
-                continue
+            
+            fox_data['pause_timer'] += dt
+
+            if not fox_data['paused'] and fox_data['pause_timer'] >= 7.0:
+
+      
+                fox_data['paused'] = True
+                fox_data['pause_timer'] = 0.0
+            
+            if fox_data['paused']:
+
+            
+                if fox_data['pause_timer'] >= 3.0:
+                    fox_data['paused'] = False
+                    fox_data['pause_timer'] = 0.0
+                else:
+                    fox_data['pause_timer'] += dt
+                    continue
 
             wp = fox_data['waypoints'][fox_data['current_wp_index']]
             cx, cy, cz, cyaw = fox_data['current_pos']
@@ -200,10 +222,7 @@ class FoxManagerNode(Node):
     
 
     def shootCallback(self, msg):
-        self.get_logger().info("SHOOT CALLBACK*************************************")
-        self.get_logger().info("SHOOT CALLBACK*************************************")
-        self.get_logger().info("SHOOT CALLBACK*************************************")
-        self.get_logger().info("SHOOT POSE************************************* " + str(msg))
+        
 
         xPose = msg.x
         yPose = msg.y
