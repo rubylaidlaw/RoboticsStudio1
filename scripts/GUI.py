@@ -175,17 +175,33 @@ class RobotLauncher(tk.Tk):
         self.after(0, lambda: self.distance_label.config(text=f"Distance to goal: {distance:.2f} m"))
 
     def update_camera_view(self, frame):
-        frame = cv2.resize(frame, (400, 250))
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower_red, upper_red = (0, 70, 50), (10, 255, 255)
-        mask = cv2.inRange(hsv, lower_red, upper_red)
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        imgtk = ImageTk.PhotoImage(image=PILImage.fromarray(rgb))
-        mask_imgtk = ImageTk.PhotoImage(image=PILImage.fromarray(mask))
-        self.camera_label.imgtk = imgtk
-        self.camera_label.configure(image=imgtk)
-        self.mask_label.imgtk = mask_imgtk
-        self.mask_label.configure(image=mask_imgtk)
+        def update():
+            frame_resized = cv2.resize(frame, (400, 250))
+            hsv = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2HSV)
+            lower_red, upper_red = (0, 70, 50), (10, 255, 255)
+            mask = cv2.inRange(hsv, lower_red, upper_red)
+            rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+            imgtk = ImageTk.PhotoImage(image=PILImage.fromarray(rgb))
+            mask_imgtk = ImageTk.PhotoImage(image=PILImage.fromarray(mask))
+            self.camera_label.imgtk = imgtk
+            self.camera_label.configure(image=imgtk)
+            self.mask_label.imgtk = mask_imgtk
+            self.mask_label.configure(image=mask_imgtk)
+
+        self.after(0, update)  # Queue the GUI update on the main thread
+
+    # def update_camera_view(self, frame):
+    #     frame = cv2.resize(frame, (400, 250))
+    #     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    #     lower_red, upper_red = (0, 70, 50), (10, 255, 255)
+    #     mask = cv2.inRange(hsv, lower_red, upper_red)
+    #     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #     imgtk = ImageTk.PhotoImage(image=PILImage.fromarray(rgb))
+    #     mask_imgtk = ImageTk.PhotoImage(image=PILImage.fromarray(mask))
+    #     self.camera_label.imgtk = imgtk
+    #     self.camera_label.configure(image=imgtk)
+    #     self.mask_label.imgtk = mask_imgtk
+    #     self.mask_label.configure(image=mask_imgtk)
 
     # --- Battery & Ammo ---
     def decrease_battery(self):
