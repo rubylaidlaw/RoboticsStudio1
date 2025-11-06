@@ -17,8 +17,12 @@ class FoxManagerNode(Node):
         super().__init__('foxManagerNode')
         self.world = "large_demo"
         self.box_name = "fox"
-        self.sdf_path = "/home/student/RoboticsStudio1-new/models/fox/model.sdf"
-        #self.sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model.sdf"
+        # root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # self.sdf_path = os.path.join(root, "models", "fox", "model.sdf")
+        self.sdf_path = "fox/model.sdf"
+        # self.sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model.sdf"
+        # self.sdf_path = "/home/student/RoboticsStudio1-new/models/fox/model.sdf"
+        # self.sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model.sdf"
         self.shot = False
         # Create service client
         self.set_pose_client = self.create_client(
@@ -311,8 +315,9 @@ class FoxManagerNode(Node):
     def spawn_fox_model(self, fox_name, x, y, z, roll=0.0, pitch=0.0, yaw=0.0):
         """Spawn a fox using a specific SDF model at a given pose."""
         qx, qy, qz, qw = self.euler_to_quaternion(roll, pitch, yaw)
-        sdf_path = "/home/student/RoboticsStudio1-new/models/fox/model_dead.sdf"
-        #sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model_dead.sdf"
+        sdf_path = "fox/model_dead.sdf"
+        # sdf_path = "/home/student/RoboticsStudio1-new/models/fox/model_dead.sdf"
+        # sdf_path = "/home/student/ros2_ws/src/RoboticsStudio1/models/fox/model_dead.sdf"
 
         req = (
             f'name: "{fox_name}"; '
