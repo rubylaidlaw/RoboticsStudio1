@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="harpoon_arm">
+
+  <xacro:macro name="harpoon_arm" params="parent_link">
+    <!-- Base link of Harpoon -->
+    <link name="harpoon_base">
+      <visual>
+        <origin xyz="0 0 0.25" rpy="0 0 1.5708"/>
+        <geometry>
+          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/base.STL"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- Barrel -->
+    <link name="harpoon_barrel">
+      <visual>
+        <origin xyz="0 0 0.47" rpy="0 0 1.5708"/>
+        <geometry>
+          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/barrel.STL"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- <gazebo reference="harpoon_barrel">
+      <plugin name="fire_projectile_plugin"
+              filename="libfire_projectile_system.so">
+        <barrel_link>harpoon_barrel</barrel_link>
+        <projectile_velocity>30.0</projectile_velocity>
+      </plugin>
+    </gazebo> -->
+
+    <!-- Fixed joint connecting base to barrel -->
+    <joint name="harpoon_joint" type="fixed">
+      <parent link="harpoon_base"/>
+      <child link="harpoon_barrel"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <!-- Projectile
+    <link name="harpoon_projectile">
+      <inertial>
+        <mass value="0.05"/>
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.0001" iyy="0.0001" izz="0.0001"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0.75" rpy="0 0 1.5708"/>
+        <geometry>
+          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/projectile.STL" scale="0.1 0.1 0.1"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.75" rpy="0 0 1.5708"/>
+        <geometry>
+          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/projectile.STL" scale="0.1 0.1 0.1"/>
+        </geometry>
+      </collision>
+    </link>
+
+    Initially attach projectile to barrel
+    <joint name="harpoon_projectile_joint" type="fixed">
+      <parent link="harpoon_barrel"/>
+      <child link="harpoon_projectile"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint> -->
+
+    <joint name="harpoon_mount" type="fixed">
+      <parent link="${parent_link}"/>
+      <child link="harpoon_base"/>
+      <!-- Adjust xyz to position the harpoon properly -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

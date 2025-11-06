@@ -6,7 +6,12 @@ source ~/41068_ws/install/setup.bash
 sleep 2
 
 pkill -f gazebo
-pkill -f ignition
+pkill -f gazebo
+pkill -f gz
+pkill -f ign
+pkill -f ign_gazebo
+pkill -f ignition 
+pkill -f ros2
 
 sleep 2
 

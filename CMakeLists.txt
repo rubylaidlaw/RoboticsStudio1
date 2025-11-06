@@ -23,6 +23,7 @@ install(PROGRAMS
   scripts/navigation.py
   scripts/send_goal.py
   scripts/GUI.py
+  scripts/projectile_launch.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
