@@ -181,4 +181,8 @@
   </joint>
   <link name="camera_depth_optical_frame"/>
 
+  <!-- Include the Harpoon arm -->
+  <xacro:include filename="$(find 41068_ignition_bringup)/urdf/harpoon.urdf.xacro" />
+  <xacro:harpoon_arm parent_link="base_link"/>
+
 </robot>
