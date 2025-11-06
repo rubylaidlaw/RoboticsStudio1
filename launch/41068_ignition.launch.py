@@ -177,6 +177,15 @@ def generate_launch_description():
     )
     ld.add_action(fox_detector)
 
+    # Launch the harpoon laser node
+    harpoon_laser_node = Node(
+        package='41068_ignition_bringup',
+        executable='projectile_launch.py',
+        name='harpoon_laser_node',
+        output='screen',
+    )
+    ld.add_action(harpoon_laser_node)
+
     return ld
 
 
