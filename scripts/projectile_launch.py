@@ -53,7 +53,7 @@ class HarpoonLaserNode(Node):
     def process_target(self, msg: PoseStamped):
         try:
             trans = self.tf_buffer.lookup_transform(
-                'world', 'harpoon_barrel', rclpy.time.Time()
+                'odom', 'harpoon_barrel', rclpy.time.Time()
             )
             barrel_x = trans.transform.translation.x
             barrel_y = trans.transform.translation.y
@@ -86,7 +86,7 @@ class HarpoonLaserNode(Node):
         # If the laser hit the target, publish a PoseStamped with the hit location.
         if hit:
             hit_pose = PoseStamped()
-            hit_pose.header.frame_id = 'world'
+            hit_pose.header.frame_id = 'odom'
             hit_pose.header.stamp = self.get_clock().now().to_msg()
             hit_pose.pose.position.x = hit_x
             hit_pose.pose.position.y = hit_y
@@ -109,7 +109,7 @@ class HarpoonLaserNode(Node):
         # Sets color to green, width 2 cm.
         # Published to RViz.
         beam = Marker()
-        beam.header.frame_id = 'world'
+        beam.header.frame_id = 'odom'
         beam.header.stamp = self.get_clock().now().to_msg()
         beam.ns = 'harpoon_laser'
         beam.id = 0
