@@ -5,7 +5,7 @@ from geometry_msgs.msg import PoseStamped, PointStamped, Point # Message Types U
 from visualization_msgs.msg import Marker # For publishing RViz visualisation markers marking hits
 from std_msgs.msg import Bool
 import math
-from tf2_ros import Buffer, TransformListener
+from tf2_ros import Buffer, TransformListener, LookupException, ConnectivityException, ExtrapolationException
 from tf2_geometry_msgs import do_transform_pose
 
 class HarpoonLaserNode(Node):
@@ -17,7 +17,7 @@ class HarpoonLaserNode(Node):
         self.declare_parameter('max_range', 10.0) # Declares a ROS2 parameter max_range with default 10 meters.
         self.max_range = float(self.get_parameter('max_range').value) # Reads the parameter into a Python variable self.max_range
 
-        # Subscribe to Fox target from camera detector
+        # Subscribe to Fox target from camera detector - Exp
         self.target_sub = self.create_subscription(
             PointStamped,
             '/fox_target',
@@ -37,38 +37,45 @@ class HarpoonLaserNode(Node):
 
         self.get_logger().info('Harpoon laser node started.') # Logs startup message
 
-    
+    # Triggered when a PointStamped message is received on /fox_target
+    # Recieve target point in camera_link frame and convert to PoseStamped Message
     def target_callback(self, msg: PointStamped):
         # Convert PointStamped → PoseStamped for consistency
-        target_pose = PoseStamped()
-        target_pose.header = msg.header
-        target_pose.pose.position = msg.point
+        target_pose = PoseStamped() # Coverts PointStamped to PoseStamped
+        target_pose.header = msg.header # Copies header from PointStamped
+        target_pose.pose.position = msg.point # Sets position from PointStamped
 
         # Orientation left as identity (no rotation)
-        target_pose.pose.orientation.w = 1.0
+        target_pose.pose.orientation.w = 1.0 # Sets a neutral orientation (no rotation).
 
-        # Proceed with same logic as before
-        self.process_target(target_pose)
+        # Pass to main processing function
+        self.process_target(target_pose) 
         
+
+    # Processes the target PoseStamped to simulate laser firing and determine hit location.
     def process_target(self, msg: PoseStamped):
         try:
+            # Get Barrel position from TF camera_link → harpoon_barrel
             trans = self.tf_buffer.lookup_transform(
-                'odom', 'harpoon_barrel', rclpy.time.Time()
+                'harpoon_barrel','camera_link', rclpy.time.Time()
             )
+            # Extract Barrel Position
             barrel_x = trans.transform.translation.x
             barrel_y = trans.transform.translation.y
             barrel_z = trans.transform.translation.z
         except Exception as e:
             self.get_logger().warn(f'No TF for harpoon_barrel: {e}')
             return
-
-        tx, ty, tz = msg.pose.position.x, msg.pose.position.y, msg.pose.position.z
-        dx, dy, dz = tx - barrel_x, ty - barrel_y, tz - barrel_z
-        dist = math.sqrt(dx*dx + dy*dy + dz*dz)
-        if dist == 0.0:
+        
+        # Extract Target Position from PoseStamped
+        tx, ty, tz = msg.pose.position.x, msg.pose.position.y, msg.pose.position.z # Target Position
+        dx, dy, dz = tx - barrel_x, ty - barrel_y, tz - barrel_z # Direction Vector from Barrel to Target
+        dist = math.sqrt(dx*dx + dy*dy + dz*dz) # Euclidean Distance to Target
+        if dist == 0.0: # Check for zero distance to avoid division by zero
             self.get_logger().warn('Target at barrel origin; ignoring')
             return
 
+        # Determine if distance is within laser range after shot (determines if hit or miss)
         if dist > self.max_range:
             scale = self.max_range / dist
             hit_x = barrel_x + dx * scale
@@ -100,14 +107,12 @@ class HarpoonLaserNode(Node):
             shot_msg.y = hit_y
             shot_msg.z = hit_z
             self.fox_shot_pub.publish(shot_msg)
-            self.get_logger().info(f"Fox Shot at ({hit_x:.2f}, {hit_y:.2f}, {hit_z:.2f})")
 
-        # Laser line marker
-        # Publish visualization: laser beam and hit sphere
-        # Creates a line strip marker representing the laser beam.
+            # log Coordinates in Map Frame
+            self.get_logger().info(f"Fox Shot at ({hit_x:.2f}, {hit_y:.2f}, {hit_z:.2f}) in frame '{msg.header.frame_id}")
+
+        # Creates a line strip marker representing the laser beam from barrel to the hit point
         # Starts at barrel, ends at hit location.
-        # Sets color to green, width 2 cm.
-        # Published to RViz.
         beam = Marker()
         beam.header.frame_id = 'odom'
         beam.header.stamp = self.get_clock().now().to_msg()
@@ -118,10 +123,11 @@ class HarpoonLaserNode(Node):
         p0 = Point(x=barrel_x, y=barrel_y, z=barrel_z)
         p1 = Point(x=hit_x, y=hit_y, z=hit_z)
         beam.points = [p0, p1]
+        # Sets color to green, width 2 cm.
         beam.scale.x = 0.02
         beam.color.a = 1.0
         beam.color.g = 1.0
-        self.marker_pub.publish(beam)
+        self.marker_pub.publish(beam) # Publishes the laser beam marker to RViz Topic
 
         # Hit sphere marker
         # Publishes a small red sphere at the hit location for RViz visualization.
