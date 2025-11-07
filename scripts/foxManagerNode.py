@@ -18,7 +18,10 @@ class FoxManagerNode(Node):
     def __init__(self):
         super().__init__('foxManagerNode')
        
-     
+        self.declare_parameter('num_foxes', 4)
+        self.numFoxes = self.get_parameter('num_foxes').value
+        self.get_logger().info(f'NUMMMMMMMMMMMMMMMMMMMMMMM FOXESSSSSSSSSSSSSSS: {self.numFoxes}')
+
         self.world = "large_demo"
         self.box_name = "fox"
         fox_pkg_share = get_package_share_directory('41068_ignition_bringup')
@@ -45,14 +48,15 @@ class FoxManagerNode(Node):
         self.xmin, self.xmax = -11, 11
         self.ymin, self.ymax = -11, 11
 
-        self.foxes = {
+        allFoxes = {
             'foxy1': {
                 'waypoints': [(-5, 1, 0), (1, 1, 0), (4, -4, 0), (8, 8, 0)],
-                'current_pos': [-5, 1, 0, 0],  # x, y, z, yaw
+                'current_pos': [-5, 1, 0, 0], 
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 4.0,
+                'paused': False
             },
             'foxy2': {
                 'waypoints': [(3, 3, 0), (3, -5, 0), (3, -5, 0), (-12, 12, 0)],
@@ -60,7 +64,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 2.0,
+                'paused': False
             },
             'foxy3': {
                 'waypoints': [(-10, -10, 0), (10, -10, 0), (10, 10, 0), (-10, 10, 0)],
@@ -68,7 +73,8 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 0.0,
+                'paused': False
             },
             'foxy4': {
                 'waypoints': [(-2, -2, 0), (2, -2, 0), (4, -5, 0), (1, -4, 0)],
@@ -76,17 +82,54 @@ class FoxManagerNode(Node):
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
-                'death_animation': None
+                'pause_timer': 6.0,
+                'paused': False
+            },
+            'foxy5': {
+                'waypoints': [(-9, 8, 0), (-5, -5, 0), (8, -5, 0), (2, 2, 0)],
+                'current_pos': [-9, 8, 0, 0],
+                'current_wp_index': 0,
+                'speed': 0.5,
+                'shot': False,
+                'pause_timer': 8.0,
+                'paused': False
+            },
+            'foxy6': {
+                'waypoints': [(3, 9, 0), (-4, 3, 0), (2, -1, 0), (-6, -8, 0)],
+                'current_pos': [3, 9, 0, 0],
+                'current_wp_index': 0,
+                'speed': 0.5,
+                'shot': False,
+                'pause_timer': 10.0,
+                'paused': False
             }
         }
+
+        self.foxes = dict(list(allFoxes.items())[:self.numFoxes])
 
         self.get_logger().info('FoxManager initialized with shot detection')
 
     def move_all_foxes_step(self, dt=0.05):
         """Move all foxes one step toward their next waypoint"""
         for fox_name, fox_data in self.foxes.items():
-            if fox_data['shot']:
-                continue
+            
+            fox_data['pause_timer'] += dt
+
+            if not fox_data['paused'] and fox_data['pause_timer'] >= 7.0:
+
+      
+                fox_data['paused'] = True
+                fox_data['pause_timer'] = 0.0
+            
+            if fox_data['paused']:
+
+            
+                if fox_data['pause_timer'] >= 3.0:
+                    fox_data['paused'] = False
+                    fox_data['pause_timer'] = 0.0
+                else:
+                    fox_data['pause_timer'] += dt
+                    continue
 
             wp = fox_data['waypoints'][fox_data['current_wp_index']]
             cx, cy, cz, cyaw = fox_data['current_pos']
@@ -179,6 +222,7 @@ class FoxManagerNode(Node):
     
 
     def shootCallback(self, msg):
+        
 
         xPose = msg.x
         yPose = msg.y
@@ -361,24 +405,24 @@ def main(args=None):
     time.sleep(2)
 
     # TEST: Simulate a shot after 5 seconds
-    def test_shot():
-        time.sleep(5)
-        # Get foxy1's position and shoot near it
-        fx, fy, _, _ = manager.foxes['foxy1']['current_pos']
+    # def test_shot():
+    #     time.sleep(5)
+    #     # Get foxy1's position and shoot near it
+    #     fx, fy, _, _ = manager.foxes['foxy1']['current_pos']
 
-        # Publish a shot at foxy1's location
-        from geometry_msgs.msg import Point
-        shot_msg = Point()
-        shot_msg.x = fx   # Slightly offset
-        shot_msg.y = fy 
-        shot_msg.z = 1.0  # Detection threshold
+    #     # Publish a shot at foxy1's location
+    #     from geometry_msgs.msg import Point
+    #     shot_msg = Point()
+    #     shot_msg.x = fx   # Slightly offset
+    #     shot_msg.y = fy 
+    #     shot_msg.z = 1.0  # Detection threshold
 
-        manager.get_logger().info(f'TEST: Firing shot at ({shot_msg.x}, {shot_msg.y})')
-        manager.shootCallback(shot_msg)
+    #     manager.get_logger().info(f'TEST: Firing shot at ({shot_msg.x}, {shot_msg.y})')
+    #     manager.shootCallback(shot_msg)
 
-    # Uncomment to test
+    # # Uncomment to test
+    # # threading.Thread(target=test_shot, daemon=True).start()
     # threading.Thread(target=test_shot, daemon=True).start()
-    threading.Thread(target=test_shot, daemon=True).start()
 
     # Movement loop
     try:

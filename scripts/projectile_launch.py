@@ -54,6 +54,10 @@ class HarpoonLaserNode(Node):
 
     # Processes the target PoseStamped to simulate laser firing and determine hit location.
     def process_target(self, msg: PoseStamped):
+
+        ## ADDED BY RUBY TO TEST ROS TOPIC EXCHANGE
+        self.fox_shot_pub.publish(msg.pose.position)
+        
         try:
             # Get Barrel position from TF camera_link → harpoon_barrel
             trans = self.tf_buffer.lookup_transform(
