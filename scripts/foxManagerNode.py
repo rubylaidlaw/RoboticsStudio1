@@ -6,12 +6,17 @@ import math
 import json
 from ros_gz_interfaces.srv import SpawnEntity, DeleteEntity, SetEntityPose
 import time
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, Pose
 import subprocess
 import threading
 import random
 from ament_index_python.packages import get_package_share_directory
 import os
+from tf2_ros import Buffer, TransformListener
+from tf2_geometry_msgs import do_transform_point
+from geometry_msgs.msg import PointStamped
+from rclpy.duration import Duration
+from tf2_msgs.msg import TFMessage
 
 class FoxManagerNode(Node):
 
@@ -28,6 +33,16 @@ class FoxManagerNode(Node):
         self.sdf_path = os.path.join(fox_pkg_share, 'models', 'fox', 'model.sdf')
         self.dead_sdf_path = os.path.join(fox_pkg_share, 'models', 'fox', 'model_dead.sdf')
         
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+
+        self.create_subscription(
+            TFMessage,
+            '/model/husky/pose',
+            self.robot_pose_callback,
+            10
+        )
+
         self.shot = False
         # Create service client
         self.set_pose_client = self.create_client(SetEntityPose,
@@ -45,13 +60,13 @@ class FoxManagerNode(Node):
                                                  10)
 
         ## MIN & MAX VARIABLES FOR WORLD
-        self.xmin, self.xmax = -11, 11
-        self.ymin, self.ymax = -11, 11
+        self.xmin, self.xmax = -10, 10
+        self.ymin, self.ymax = -10, 10
 
         allFoxes = {
             'foxy1': {
-                'waypoints': [(-5, 1, 0), (1, 1, 0), (4, -4, 0), (8, 8, 0)],
-                'current_pos': [-5, 1, 0, 0], 
+                'waypoints': [(2, 0, 0)],
+                'current_pos': [2, 0, 0, 0], 
                 'current_wp_index': 0,
                 'speed': 0.5,
                 'shot': False,
@@ -155,6 +170,25 @@ class FoxManagerNode(Node):
             # Set pose for that fox (each loop)
             self.set_pose_for_fox(fox_name, nx, ny, cz, nyaw)
 
+    def robot_pose_callback(self, msg):
+        """Store robot's position in Gazebo world frame from TFMessage"""
+        # TFMessage contains a list of transforms
+        # We need to find the one for base_link (or husky)
+        for transform in msg.transforms:
+            # The transform should be from world to base_link (or similar)
+            # Check the child_frame_id to find the robot
+            if 'base_link' in transform.child_frame_id or 'husky' in transform.child_frame_id:
+                self.robot_world_pose = transform.transform.translation
+                
+                # Log once for verification
+                if not hasattr(self, '_logged_robot_pose'):
+                    self.get_logger().info(
+                        f"Robot Gazebo world pose: ({self.robot_world_pose.x:.2f}, "
+                        f"{self.robot_world_pose.y:.2f}) "
+                        f"[frame: {transform.header.frame_id} � {transform.child_frame_id}]"
+                    )
+                    self._logged_robot_pose = True
+                break
     
     def spawnAllFoxes(self):
         """
@@ -219,34 +253,115 @@ class FoxManagerNode(Node):
         # Send async request
         self.delete_client.call_async(req)
 
-    
-
     def shootCallback(self, msg):
+        # Check if we have robot's world pose
+        if not hasattr(self, 'robot_world_pose') or self.robot_world_pose is None:
+            self.get_logger().warn("Robot world pose not yet available")
+            return
         
-
-        xPose = msg.x
-        yPose = msg.y
-
+        # Shot position in odom frame (from msg)
+        shot_x_odom = msg.x
+        shot_y_odom = msg.y
+        
+        try:
+              # Get robot's current position in odom frame
+            trans = self.tf_buffer.lookup_transform(
+                'odom', 'base_link', rclpy.time.Time()
+            )
+            robot_x_odom = trans.transform.translation.x
+            robot_y_odom = trans.transform.translation.y
+            
+            # Robot's position in Gazebo world frame (from /model/husky/pose)
+            robot_x_world = self.robot_world_pose.x
+            robot_y_world = self.robot_world_pose.y
+            odom_origin_x = robot_x_world - robot_x_odom
+            odom_origin_y = robot_y_world - robot_y_odom
+            
+            # Transform shot from odom to world frame
+            xPose = odom_origin_x + shot_x_odom
+            yPose = odom_origin_y + shot_y_odom
+            
+            self.get_logger().info(f"Shot odom: ({shot_x_odom:.2f}, {shot_y_odom:.2f})")
+            self.get_logger().info(f"Robot odom: ({robot_x_odom:.2f}, {robot_y_odom:.2f})")
+            self.get_logger().info(f"Robot world: ({robot_x_world:.2f}, {robot_y_world:.2f})")
+            self.get_logger().info(f"Odom origin in world: ({odom_origin_x:.2f}, {odom_origin_y:.2f})")
+            self.get_logger().warn(f"SHOT WORLD: ({xPose:.2f}, {yPose:.2f})")
+            
+        except Exception as e:
+            self.get_logger().error(f"TF transform failed: {e}")
+            return
+        
+        # Fox hit detection with distance logging
         closestFox = None
-
-        ## FIND OUT WHCIH FOX WAS SHOT
+        minDistance = float('inf')
+        
         for fox_name, fox_data in self.foxes.items():
             fx, fy, _, _ = fox_data['current_pos']
             distance = math.sqrt((xPose - fx)**2 + (yPose - fy)**2)
-
-            if distance < 0.1:
-
+            
+            self.get_logger().info(f"{fox_name}: world pos ({fx:.2f}, {fy:.2f}), distance = {distance:.2f}m")
+            if distance < 1.0 and distance < minDistance:
                 closestFox = fox_name
-
+                minDistance = distance
+        
         if closestFox:
-            self.get_logger().info(f'Shot detected! Hit fox: {closestFox}')
+            self.get_logger().info(f'Shot detected! Hit fox: {closestFox} (distance: {minDistance:.2f}m)')
             self.killFox(closestFox)
         else:
-            self.get_logger().info(f'Shot detected! But did not hit a fox!')
-            for name, data in self.foxes.items():
-                self.get_logger().info(f"{name} current_pos: {data['current_pos']}")
+            self.get_logger().info(f'Miss! Closest fox was {minDistance:.2f}m away')
 
-            # @TODO ADD IN CALL TO ESTOP HERE
+                
+
+    # def shootCallback(self, msg):
+
+  
+    #     shot_point = PointStamped()
+    #     shot_point.header.frame_id = "odom"  # robot frame
+    #     # Use current time; it won't matter because we'll use latest transform
+    #     shot_point.header.stamp = rclpy.time.Time().to_msg() 
+    #     shot_point.point = msg
+    #     self.get_logger().info(f"Looking up transform from {shot_point.header.frame_id} � map")
+
+    #     try:
+    #         trans = self.tf_buffer.lookup_transform(
+    #             'map', 'odom', rclpy.time.Time()
+    #         )
+    #         # Get latest available transform, ignoring timestamp
+    #         shot_in_map = do_transform_point(shot_point, trans)
+    #         frames = self.tf_buffer.all_frames_as_string()
+          
+    #         self.get_logger().info(f"Transform used: {trans.transform.translation}")
+
+    #         xPose = shot_in_map.point.x + self.robot_world_pose.x
+    #         yPose = shot_in_map.point.y + self.robot_world_pose.y
+            
+    #         self.get_logger().warn(f"X POSE WORLD POINT: {xPose}")
+    #         self.get_logger().warn(f"Y POSE WORLD POINT: {yPose}")
+
+    #     except Exception as e:
+    #         self.get_logger().warn(f"TF transform failed: {e}")
+    #         return
+    
+            
+    #     # Continue with your fox hit detection
+    #     closestFox = None
+    #     for fox_name, fox_data in self.foxes.items():
+    #         fx, fy, _, _ = fox_data['current_pos']
+    #         distance = math.sqrt((xPose - fx)**2 + (yPose - fy)**2)
+    #         if distance < 1:
+    #             closestFox = fox_name
+
+    #     if closestFox:
+    #         self.get_logger().info(f'Shot detected! Hit fox: {closestFox}')
+    #         self.killFox(closestFox)
+    #     else:
+    #         self.get_logger().info('Shot detected! But did not hit a fox!')
+    #         for name, data in self.foxes.items():
+        
+    #             self.get_logger().info(f"{name} current_pos: {data['current_pos']}")
+
+
+
 
     def euler_to_quaternion(self, roll, pitch, yaw):
         """
