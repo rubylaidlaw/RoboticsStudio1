@@ -19,6 +19,22 @@
   gz_type_name: 'ignition.msgs.Odometry'
   direction: GZ_TO_ROS
 
+# Robot pose in Gazebo world frame
+# Robot pose in Gazebo world frame
+- ros_topic_name: '/robot/pose'
+  gz_topic_name: '/pose'
+  ros_type_name: 'tf2_msgs/msg/TFMessage'
+  gz_type_name: 'ignition.msgs.Pose_V'
+  direction: GZ_TO_ROS
+
+# Robot pose in Gazebo world frame  
+- ros_topic_name: '/model/husky/pose'
+  gz_topic_name: '/world/large_demo/pose/info'  # or /world/simple_trees/pose/info
+  ros_type_name: 'tf2_msgs/msg/TFMessage'
+  gz_type_name: 'ignition.msgs.Pose_V'
+  direction: GZ_TO_ROS
+
+
 # Intertial Measurement Unit
 - ros_topic_name: '/imu'
   gz_topic_name: '/model/husky/imu'
