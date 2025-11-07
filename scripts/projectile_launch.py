@@ -53,8 +53,8 @@ class HarpoonLaserNode(Node):
     def process_target(self, msg: PoseStamped):
 
         ## ADDED BY RUBY TO TEST ROS TOPIC EXCHANGE
-        self.fox_shot_pub.publish(msg.pose.position)
-        
+        # self.fox_shot_pub.publish(msg.pose.position)
+
         try:
             trans = self.tf_buffer.lookup_transform(
                 'odom', 'harpoon_barrel', rclpy.time.Time()

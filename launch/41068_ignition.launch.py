@@ -24,6 +24,13 @@ def generate_launch_description():
     ld.add_action(num_foxes_arg)
     num_foxes = LaunchConfiguration('num_foxes')
 
+    slam_launch_arg = DeclareLaunchArgument(
+        'slam',
+        default_value='true',  # or 'false' if you want it off by default
+        description='Enable SLAM Toolbox'
+    )
+    ld.add_action(slam_launch_arg)
+
     # Additional command line arguments
     # Declare launch arguments for spawn position (dynamic)
     declare_x_arg = DeclareLaunchArgument(
@@ -54,6 +61,14 @@ def generate_launch_description():
         description='Flag to launch RViz'
     )
     ld.add_action(rviz_launch_arg)
+    
+    slam_params_arg = DeclareLaunchArgument(
+    'slam_params_file',
+    default_value=PathJoinSubstitution([config_path, 'slam_params.yaml']),
+    description='Path to the SLAM Toolbox parameters file'
+    )
+    ld.add_action(slam_params_arg)
+    slam_params_file = LaunchConfiguration('slam_params_file')
 
     nav2_launch_arg = DeclareLaunchArgument(
         'nav2',
@@ -97,13 +112,28 @@ def generate_launch_description():
     )
     ld.add_action(robot_localization_node)
 
+    slam_node = Node(
+        package='slam_toolbox',
+        executable='sync_slam_toolbox_node',  # for ROS2 Humble/Foxy
+        name='slam_toolbox',
+        output='screen',
+        parameters=[
+            slam_params_file,
+            {'use_sim_time': use_sim_time}  # <-- add this
+        ],
+        condition=IfCondition(LaunchConfiguration('slam'))  # Only if slam:=true
+    )
+    ld.add_action(slam_node)
+
+
     service_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
             '/world/large_demo/set_pose@ros_gz_interfaces/srv/SetEntityPose',
             '/world/large_demo/create@ros_gz_interfaces/srv/SpawnEntity',
-            '/world/large_demo/remove@ros_gz_interfaces/srv/DeleteEntity'
+            '/world/large_demo/remove@ros_gz_interfaces/srv/DeleteEntity',
+            '/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V' # Add this
         ],
         output='screen',
         name='set_pose_bridge'
@@ -174,7 +204,10 @@ def generate_launch_description():
         package='41068_ignition_bringup',
         executable='foxManagerNode.py',
         output='screen',
-        parameters=[{'num_foxes': num_foxes}]
+        parameters=[
+            {'num_foxes': num_foxes},
+            {'use_sim_time': use_sim_time}   # <-- add this
+        ]
     )
     ld.add_action(spawn_fox)
 

@@ -7,7 +7,9 @@
       <visual>
         <origin xyz="0 0 0.25" rpy="0 0 1.5708"/>
         <geometry>
-          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/base.STL"/>
+          <mesh>
+            <uri>package://41068_ignition_bringup/urdf/meshes/harpoon_arm/base.STL</uri>
+          </mesh>
         </geometry>
       </visual>
     </link>
@@ -17,7 +19,9 @@
       <visual>
         <origin xyz="0 0 0.47" rpy="0 0 1.5708"/>
         <geometry>
-          <mesh filename="package://41068_ignition_bringup/urdf/meshes/harpoon_arm/barrel.STL"/>
+          <mesh>
+            <uri>package://41068_ignition_bringup/urdf/meshes/harpoon_arm/barrel.STL</uri>
+          </mesh>
         </geometry>
       </visual>
     </link>
